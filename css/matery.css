@@ -2147,7 +2147,7 @@ footer .copy-right {
     margin: 20px 0;
     border-radius: 6px;
     overflow: hidden;
-    background: #e8e7f541;           /* 浅灰背景（亮色主题） */
+    background: #000000fb;           /* 浅灰背景（亮色主题） */
     border: 1px solid #2c3a4b;     /* 淡边框 */
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
@@ -2161,7 +2161,7 @@ footer .copy-right {
     font-family: 'Consolas', 'Courier New', monospace;
     font-size: 16px;
     line-height: 1.8;
-    color: #020202;
+    color: #fbf7f762;
     tab-size: 4;
 }
 
