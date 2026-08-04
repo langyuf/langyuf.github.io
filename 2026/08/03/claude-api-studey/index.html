@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Hexo搭建教程, langyf">
+    <meta name="keywords" content="Claude_API_Studey, langyf">
     <meta name="description" content="">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Hexo搭建教程 | langyf</title>
+    <title>Claude_API_Studey | langyf</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -310,12 +310,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/19.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/18.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Hexo搭建教程</h1>
+                    <h1 class="description center-align post-title">Claude_API_Studey</h1>
                 </div>
             </div>
         </div>
@@ -431,8 +431,12 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/hexo/">
-                                <span class="chip bg-color">hexo</span>
+                            <a href="/tags/API/">
+                                <span class="chip bg-color">API</span>
+                            </a>
+                        
+                            <a href="/tags/Claude/">
+                                <span class="chip bg-color">Claude</span>
                             </a>
                         
                     </div>
@@ -447,7 +451,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2026-08-01
+                    2026-08-03
                 </div>
                 
 
@@ -461,14 +465,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    391
+                    2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    9 分
                 </div>
                 
 
@@ -486,22 +490,70 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>搭建hexo博客 （<a href="https://langyuf.github.io/%EF%BC%89">https://langyuf.github.io/）</a><br>1、git的安装</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">windows中:PowerShell 输入 git -v 显示 Git 版本</span><br><span class="line">官网下载地址:https://git-scm.com/</span><br></pre></td></tr></table></figure>
-
-<p>2、node.js安装</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">https://www.nodejs.com.cn/download.html</span><br><span class="line">node -v 查看版本信息(尽量下载最新版本)</span><br><span class="line">配置环境</span><br></pre></td></tr></table></figure>
-
-<p>3、在git bash中</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">1、$ cnpm install hexo-cli -g 安装hexo</span><br><span class="line">hexo -version 查看版本信息</span><br><span class="line">2、hexo init myblog 初始化(myblog必须为空)</span><br><span class="line">_config.yml 存放的是博客配置信息， source/_posts 是存放文章的地方。</span><br><span class="line">若失败可尝试换源、配置ssh证书</span><br><span class="line">3、进入myblog文件夹</span><br><span class="line">hexo clean # 清除缓存文件，建议写完文章后执行一次</span><br><span class="line">hexo g # 生成 public 文件夹，写完文章执行</span><br><span class="line">hexo s # 启动 hexo 服务</span><br></pre></td></tr></table></figure>
-<p>4、<a target="_blank" rel="noopener" href="http://localhost:4000/">http://localhost:4000/</a> 访问hexo</p>
-<blockquote>
-<p>更换主题<br>1、下载主题文件放置myblog&#x2F;themes&#x2F;下<br>2、添加_config.主题名.yml文件<br>3、修改_config.yml中themes</p>
+                <h2 id="Anthropic-API-基础知识"><a href="#Anthropic-API-基础知识" class="headerlink" title="Anthropic API 基础知识"></a>Anthropic API 基础知识</h2><p><a target="_blank" rel="noopener" href="https://github.com/anthropics/courses"> Anthropic 官方课程</a></p>
+<h3 id="一、开始使用-Claude-SDK"><a href="#一、开始使用-Claude-SDK" class="headerlink" title="一、开始使用 Claude SDK"></a>一、开始使用 Claude SDK</h3><blockquote>
+<p>在这第一课中，你将学习如何：<br>安装必要的软件包，并通过 API 进行身份验证。<br>向 Claude AI 助手提出你的第一个请求。</p>
 </blockquote>
-<p>部署在github上</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">1、创建一个新仓库，仓库名必须是用户名 + .github.io然后勾选初始化README</span><br><span class="line">2、创建一个git秘钥，ssh-keygen -t rsa -C “wangqh202208@163.com“ password:6230961</span><br><span class="line">3、cat ~/.ssh/id_rsa.pub 输出密钥信息</span><br><span class="line">4、在github中创建shh key 输入密钥</span><br><span class="line">5、git bash中输入:ssh -T git@github.com yes</span><br><span class="line">6、在创建的仓库中 code 中复制ssh中的dizhi</span><br><span class="line">7、在_config.yml文件中修改</span><br><span class="line">deploy:</span><br><span class="line">type: git</span><br><span class="line">repo: git@github.com:langyuf/langyuf.github.io.git</span><br><span class="line">branch: master</span><br><span class="line">8、执行命令</span><br><span class="line">$ git config –global user.name “yourname”</span><br><span class="line">$ git config –global user.email “youremail”</span><br><span class="line">cnpm install hexo-deployer-git –save</span><br><span class="line">hexo g -d</span><br><span class="line">9、在github仓库中的settings的pages中更改branch为master</span><br><span class="line"></span><br><span class="line">hexo g -d</span><br><span class="line">hexo s</span><br></pre></td></tr></table></figure>
-<p>创建文件夹<br>hexo new page categories</p>
-<p>网站图标<br>favicon: &#x2F;img&#x2F;favicon.png</p>
+<p><strong>Installing the SDK</strong></p>
+<blockquote>
+<p>在深入使用 SDK 之前，请确保你的系统中已安装了 Python 语言。<br>Claude Python SDK 需要使用 Python 3.7.1 或更高版本。<br>您可以在终端中运行以下命令来检查当前使用的 Python 版本：python –version<br>准备好了 Python 环境，就可以使用 pip 来安装 Anthropic 软件包了。</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pip install anthropic   #anthropic</span><br><span class="line">pip install openai      #openai、deepseek</span><br></pre></td></tr></table></figure>
+<p><strong>Getting an API key</strong></p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://platform.deepseek.com/usage"> Deepseek_Api-key</a><br><a target="_blank" rel="noopener" href="https://platform.claude.com/dashboard"> Claude_Api-key</a><br><a target="_blank" rel="noopener" href="https://openai.com/zh-Hans-CN/api/"> Openai_Api-key</a></p>
+</blockquote>
+<p>虽然你可以在 Python 脚本中直接硬编码 API 密钥，但通常来说，将敏感信息如 API 密钥与代码库分离是一种更好的做法。一种常见的方法是将 API 密钥存储在 .env 文件中，然后通过 python-dotenv package 来加载该密钥。以下是如何设置这一点的示例：</p>
+<p>1、创建一个名为 .env 的新文件。</p>
+<p>2、请按照以下格式，将你的 API 密钥添加到新创建的 .env 文件中：</p>
+<p>ANTHROPIC_API_KEY=put-your-api-key-here</p>
+3、在终端或笔记本中运行以下命令，以安装 python-dotenv 包：
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install python-dotenv</span><br></pre></td></tr></table></figure>
+现在我们可以使用 dotenv 模块中的 load_dotenv() 函数从.env 文件中加载 API 密钥，具体代码如下：
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">from dotenv import load_dotenv</span><br><span class="line">import os</span><br><span class="line">load_dotenv()</span><br><span class="line">my_api_key = os.getenv(&quot;ANTHROPIC_API_KEY&quot;)</span><br></pre></td></tr></table></figure>
+
+<p><strong>Making basic requests with the client</strong><br>已经安装了 anthropic 包，并且拥有了自己的 API 密钥，那么你现在就可以开始向 Claude API 发送请求了。这里用deepseekapi演示:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># Please install OpenAI SDK first: `pip3 install openai`</span><br><span class="line">import os</span><br><span class="line">from dotenv import load_dotenv</span><br><span class="line">from openai import OpenAI</span><br><span class="line">load_dotenv()</span><br><span class="line">client = OpenAI(</span><br><span class="line">    api_key=os.environ.get(&#x27;DEEPSEEK_API_KEY&#x27;),</span><br><span class="line">    base_url=&quot;https://api.deepseek.com&quot;)</span><br><span class="line"></span><br><span class="line">response = client.chat.completions.create(</span><br><span class="line">    model=&quot;deepseek-v4-pro&quot;,</span><br><span class="line">    max_tokens=1000,</span><br><span class="line">        messages=[</span><br><span class="line">            &#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;你的模型版本是什么。&quot;&#125;</span><br><span class="line">        ],</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">print(response.choices[0].message.content)</span><br></pre></td></tr></table></figure>
+<p>claude版本:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#伪代码</span><br><span class="line">our_first_message = client.messages.create(</span><br><span class="line">    model=&quot;claude-3-haiku-20240307&quot;,</span><br><span class="line">    max_tokens=1000,</span><br><span class="line">    messages=[</span><br><span class="line">        &#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hi there! Please write me a haiku about a pet chicken&quot;&#125;</span><br><span class="line">    ]</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">print(our_first_message.content[0].text)</span><br></pre></td></tr></table></figure>
+<p><strong>Exercise</strong> </p>
+<blockquote>
+<p>TASK:</p>
+<ul>
+<li>创建一个新 Python 脚本。</li>
+<li>导入正确的软件包。</li>
+<li>请填写您的 Anthropic API 密钥</li>
+<li>让claude给你讲一个笑话，然后打印出结果</li>
+</ul>
+</blockquote>
+<p><strong>View exercise solution</strong> </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="二、理解消息的API格式"><a href="#二、理解消息的API格式" class="headerlink" title="二、理解消息的API格式"></a>二、理解消息的API格式</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">messages=[</span><br><span class="line">        &#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What flavors are used in Dr. Pepper?&quot;&#125;</span><br><span class="line">    ]</span><br><span class="line">role ：这是一个字符串，表示消息发送者的角色。它可以是“用户”（用于由用户发送的消息），或者“助手”（用于由 Claude 发送的消息）。</span><br><span class="line">content ：这是一个字符串或内容字典列表，用于表示消息的实际内容。如果提供了字符串，则将其视为一个单独的文本内容块。如果提供了多个内容字典，每个字典都应该有一个“类型”字段（例如“text”或“image”），以及对应的内容。目前，我们将 content 视为一个单独的字符串</span><br><span class="line"></span><br><span class="line">下面是一个包含多条消息的对话示例：</span><br><span class="line"></span><br><span class="line">messages = [</span><br><span class="line">    &#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello Claude! How are you today?&quot;&#125;,</span><br><span class="line">    &#123;&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;Hello! I&#x27;m doing well, thank you. How can I assist you today?&quot;&#125;,</span><br><span class="line">    &#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Can you tell me a fun fact about ferrets?&quot;&#125;,</span><br><span class="line">    &#123;&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;Sure! Did you know that excited ferrets make a clucking vocalization known as &#x27;dooking&#x27;?&quot;&#125;,</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>消息格式使我们能够将以对话形式提出的请求结构化为对 Claude 的调用，从而保持对话的上下文完整性。这种消息格式能够保留整个对话的历史记录，包括用户和助手发送的所有消息。这样，当 Claude 生成回复时，它能够获取到完整的对话上下文信息，从而得出更加连贯且相关的回答。</p>
+<p>检查消息的响应情况</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Message(</span><br><span class="line">  id=&#x27;msg_01Mq5gDnUmDESukTgwPV8xtG&#x27;, </span><br><span class="line">  content=[TextBlock(text=&#x27;Bonjour.&#x27;, type=&#x27;text&#x27;)], </span><br><span class="line">  model=&#x27;claude-3-haiku-20240307&#x27;, </span><br><span class="line">  role=&#x27;assistant&#x27;, </span><br><span class="line">  stop_reason=&#x27;end_turn&#x27;, </span><br><span class="line">  stop_sequence=None, </span><br><span class="line">  type=&#x27;message&#x27;, </span><br><span class="line">  usage=Usage(input_tokens=19, output_tokens=8))</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>除了 content 之外， Message 对象还包含一些其他的信息：<br>&nbsp;&nbsp;id – 一个唯一的对象标识符<br>&nbsp;&nbsp;type - 对象类型，始终为“消息”<br>&nbsp;&nbsp;role – 生成的消息在对话中的角色。无论何时，它都将是“助手”的角色。<br>&nbsp;&nbsp;model - 负责处理请求并生成响应的模型<br>&nbsp;&nbsp;stop_reason – 这是模型停止生成数据的原因。我们稍后会进一步了解这个问题。<br>&nbsp;&nbsp;stop_sequence – 我们稍后会详细了解这一点。<br>&nbsp;&nbsp;usage – 关于计费和使用限定的信息。包含以下内容：</p>
+<ul>
+<li>&nbsp;&nbsp;input_tokens – 所使用的输入标记的数量。</li>
+<li>&nbsp;&nbsp;output_tokens - The number of output tokens that were used.</li>
+<li>&nbsp;&nbsp;soutput_tokens – 实际使用的输出标记数量。</li>
+</ul>
+</blockquote>
+<p><strong>Exercise</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">#编写一个名为 translate 的函数，该函数需要接受两个参数：</span><br><span class="line"># A word  一个单词</span><br><span class="line"># A language  一种语言</span><br><span class="line">#当您调用 translate 这个函数时，它应该能够返回让 Claude 将 word 翻译为 language 的结果。</span><br><span class="line">def translate(word, language):</span><br><span class="line">  response = client.messages.create(</span><br><span class="line">      model=&quot;claude-3-opus-20240229&quot;,</span><br><span class="line">      max_tokens=1000,</span><br><span class="line">      messages=[</span><br><span class="line">          &#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: f&quot;Translate the word &#123;word&#125; into &#123;language&#125;.  Only respond with the translated word, nothing else&quot;&#125;</span><br><span class="line">      ]</span><br><span class="line">  )</span><br><span class="line">  return response.content[0].text</span><br></pre></td></tr></table></figure>
+<p><strong>Exercise</strong></p>
+<blockquote>
+<ul>
+<li>请保留一个列表，用于存储对话记录。</li>
+<li>使用 input() 向用户询问消息，然后将用户输入的内容添加到消息列表中。</li>
+<li>将消息历史记录发送给 Claude 吧。</li>
+<li>请打印出claude对用户的回复内容。</li>
+<li>将claude的助手回复添加到历史记录中。</li>
+<li>返回第二步，然后重复操作！（使用循环来实现，并提供一种让用户可以退出的方法！）</li>
+</ul>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line">from dotenv import load_dotenv</span><br><span class="line">from openai import OpenAI</span><br><span class="line">import os</span><br><span class="line"></span><br><span class="line">load_dotenv()</span><br><span class="line">client = OpenAI(</span><br><span class="line">    api_key=os.environ.get(&#x27;DEEPSEEK_API_KEY&#x27;),</span><br><span class="line">    base_url=&quot;https://api.deepseek.com&quot;)</span><br><span class="line"></span><br><span class="line">messages = [</span><br><span class="line">    &#123;&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;你是一个友好的AI助手，请用中文回答用户的问题。&quot;&#125;</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"># 对话函数</span><br><span class="line">def chat_with_deepseek(user_input):</span><br><span class="line">    &quot;&quot;&quot;发送消息历史给 DeepSeek 并返回回复&quot;&quot;&quot;</span><br><span class="line">    try:</span><br><span class="line">        response = client.chat.completions.create(</span><br><span class="line">            model=&quot;deepseek-v4-pro&quot;,</span><br><span class="line">            messages=messages,  # 发送完整的历史记录</span><br><span class="line">            temperature=0.7,  # 控制回复的创造性</span><br><span class="line">        )</span><br><span class="line">        return response.choices[0].message.content</span><br><span class="line">    except Exception as e:</span><br><span class="line">        return f&quot;❌ 错误: &#123;e&#125;&quot;</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    print(&quot;=&quot; * 60)</span><br><span class="line">    print(&quot;🤖 DeepSeek 聊天机器人&quot;)</span><br><span class="line">    print(&quot;=&quot; * 60)</span><br><span class="line">    print(&quot;💡 提示:&quot;)</span><br><span class="line">    print(&quot;   - 输入 &#x27;quit&#x27; 或 &#x27;exit&#x27; 退出&quot;)</span><br><span class="line">    print(&quot;   - 输入 &#x27;clear&#x27; 清空对话历史&quot;)</span><br><span class="line">    print(&quot;   - 输入 &#x27;history&#x27; 查看对话历史&quot;)</span><br><span class="line">    print(&quot;=&quot; * 60)</span><br><span class="line">    print()</span><br><span class="line">    </span><br><span class="line">    conversation_count = 0</span><br><span class="line">    </span><br><span class="line">    while True:</span><br><span class="line">        # 获取用户输入</span><br><span class="line">        user_input = input(&quot;👤 你: &quot;).strip()</span><br><span class="line">        </span><br><span class="line">        # 检查退出命令</span><br><span class="line">        if user_input.lower() in [&#x27;quit&#x27;, &#x27;exit&#x27;, &#x27;q&#x27;]:</span><br><span class="line">            print(&quot;\n👋 再见！感谢使用 DeepSeek 聊天机器人！&quot;)</span><br><span class="line">            break</span><br><span class="line">        </span><br><span class="line">        # 清空历史</span><br><span class="line">        if user_input.lower() == &#x27;clear&#x27;:</span><br><span class="line">            messages.clear()</span><br><span class="line">            messages.append(&#123;&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;你是一个友好的AI助手，请用中文回答用户的问题。&quot;&#125;)</span><br><span class="line">            print(&quot;✅ 对话历史已清空\n&quot;)</span><br><span class="line">            continue</span><br><span class="line">        </span><br><span class="line">        # 查看历史</span><br><span class="line">        if user_input.lower() == &#x27;history&#x27;:</span><br><span class="line">            print(&quot;\n📜 对话历史:&quot;)</span><br><span class="line">            print(&quot;-&quot; * 60)</span><br><span class="line">            for msg in messages:</span><br><span class="line">                if msg[&#x27;role&#x27;] == &#x27;system&#x27;:</span><br><span class="line">                    continue</span><br><span class="line">                role_emoji = &quot;👤&quot; if msg[&#x27;role&#x27;] == &#x27;user&#x27; else &quot;🤖&quot;</span><br><span class="line">                print(f&quot;&#123;role_emoji&#125; &#123;msg[&#x27;role&#x27;].upper()&#125;: &#123;msg[&#x27;content&#x27;][:100]&#125;...&quot;)</span><br><span class="line">            print(&quot;-&quot; * 60)</span><br><span class="line">            print()</span><br><span class="line">            continue</span><br><span class="line">        </span><br><span class="line">        # 如果用户输入为空，跳过</span><br><span class="line">        if not user_input:</span><br><span class="line">            continue</span><br><span class="line">        </span><br><span class="line">        # 添加用户消息到历史</span><br><span class="line">        messages.append(&#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_input&#125;)</span><br><span class="line">        conversation_count += 1</span><br><span class="line">        </span><br><span class="line">        # 显示正在思考</span><br><span class="line">        print(&quot;🤖 DeepSeek: &quot;, end=&quot;&quot;, flush=True)</span><br><span class="line">        </span><br><span class="line">        # 获取 DeepSeek 回复</span><br><span class="line">        assistant_response = chat_with_deepseek(user_input)</span><br><span class="line">        </span><br><span class="line">        # 打印回复</span><br><span class="line">        print(assistant_response)</span><br><span class="line">        print()</span><br><span class="line">        </span><br><span class="line">        # 添加助手回复到历史</span><br><span class="line">        messages.append(&#123;&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: assistant_response&#125;)</span><br><span class="line">        </span><br><span class="line">        # 显示对话计数</span><br><span class="line">        print(f&quot;📊 对话轮次: &#123;conversation_count&#125;\n&quot;)</span><br><span class="line"></span><br><span class="line"># 7. 运行主程序</span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    main()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
                 
             </div>
@@ -528,7 +580,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="http://langyuf.github.io/2026/08/01/hexo/">http://langyuf.github.io/2026/08/01/hexo/</a>
+                    <a href="http://langyuf.github.io/2026/08/03/claude-api-studey/">http://langyuf.github.io/2026/08/03/claude-api-studey/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -566,8 +618,12 @@
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/hexo/">
-                                    <span class="chip bg-color">hexo</span>
+                                <a href="/tags/API/">
+                                    <span class="chip bg-color">API</span>
+                                </a>
+                            
+                                <a href="/tags/Claude/">
+                                    <span class="chip bg-color">Claude</span>
                                 </a>
                             
                         </div>
@@ -615,6 +671,51 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
+                <a href="/2026/08/04/ai-xiang-guan-gai-nian/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="AI相关概念">
+                        
+                        <span class="card-title">AI相关概念</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            介绍AI发展历程当中出现的技术
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2026-08-04
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            Langyuf
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/AI/">
+                        <span class="chip bg-color">AI</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
                 <a href="/2026/08/02/hello-world/">
                     <div class="card-image">
                         
@@ -631,9 +732,9 @@
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2026-08-02
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2026-08-02
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-user fa-fw"></i>
@@ -641,52 +742,6 @@
                             
                         </span>
                     </div>
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                本篇&nbsp;<i class="far fa-dot-circle"></i>
-            </div>
-            <div class="card">
-                <a href="/2026/08/01/hexo/">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/medias/featureimages/19.jpg" class="responsive-img" alt="Hexo搭建教程">
-                        
-                        <span class="card-title">Hexo搭建教程</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            搭建hexo博客（https://langyuf.github.io/）
-                        
-                    </div>
-                    <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2026-08-01
-                            </span>
-                        <span class="publish-author">
-                            
-                            <i class="fas fa-user fa-fw"></i>
-                            浪与风
-                            
-                        </span>
-                    </div>
-                </div>
-
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/hexo/">
-                        <span class="chip bg-color">hexo</span>
-                    </a>
-                    
                 </div>
                 
             </div>
