@@ -1,0 +1,353 @@
+/*
+ * 站点自定义样式（通过 _config.butterfly.yml 的 inject.head 引入）
+ */
+
+/* ---------- 顶部导航菜单居中 ---------- */
+/*
+ * Butterfly 默认把 #blog-info 设为 flex: 1，剩余空间全被站名占掉，
+ * 菜单因此被顶到最右侧。这里在菜单后面补一个同样 flex: 1 的占位元素，
+ * 与左侧站名等分剩余空间，菜单自然落在水平居中位置。
+ *
+ * 窄屏（<=768px）时主题会给 #nav 加上 .hide-menu，把菜单折叠成右下角的
+ * 汉堡按钮，此时不插入占位，保持默认的右对齐，避免按钮跑到屏幕正中间。
+ */
+@media (min-width: 769px) {
+  #nav:not(.hide-menu)::after {
+    content: '';
+    flex: 1 1 0;
+  }
+}
+/* 翻页按钮居中 */
+#pagination {
+  width: 100%;
+  margin: auto;
+}
+/* ---------- 导航下拉子菜单：横向排列并居中 ---------- */
+/*
+ * 主题默认把子菜单排成竖向列表、且右对齐到父项。这里改成一行的横排，
+ * 并在父项正下方水平居中。
+ *
+ * 注意：主题的 sub_menus 动画会写 transform，而 CSS 动画的优先级高于
+ * 普通声明，直接用 transform 做居中会被动画覆盖。所以这里自定义一份
+ * 把 translateX(-50%) 写进关键帧的动画。
+ */
+@keyframes sub_menus_row {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+#nav .menus_items .menus_item .menus_item_child {
+  right: auto;
+  left: 50%;
+  -webkit-animation: sub_menus_row 0.3s 0.1s ease both;
+  animation: sub_menus_row 0.3s 0.1s ease both;
+}
+
+#nav .menus_items .menus_item:hover .menus_item_child {
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  flex-direction: row;
+}
+
+#nav .menus_items .menus_item .menus_item_child li a {
+  width: auto;
+  white-space: nowrap;
+}
+
+/* 横排后圆角落在左右两端，而不是上下两端 */
+#nav .menus_items .menus_item .menus_item_child li:first-child {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 0;
+}
+
+#nav .menus_items .menus_item .menus_item_child li:last-child {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 0;
+}
+
+/* ---------- 文章目录（TOC）紧凑化 ---------- */
+/*
+ * 笔记的标题本身已经带了「1.2.1」这类编号，主题再自动编号一次会变成
+ * 「1.1.2.1. 1.2.1 函数模板语法」，特别占地方（已在主题配置里关掉
+ * toc.number）。这里再把字号收小、行距收紧，让侧栏目录更紧凑。
+ */
+#aside-content #card-toc .toc-content .toc-link {
+  margin: 2px 0;
+  font-size: 1em;
+  line-height: 1.5;
+}
+
+/*
+ * 目录按需展开：只展开「当前正在浏览的那一节」的直接子级，其余全部收起。
+ *
+ * 主题自带的规则 #card-toc ... .toc-item.active .toc-child 用的是「后代」
+ * 选择器，而主题脚本会把当前项的每一级祖先都标记成 active，于是 active
+ * 项下面的整棵子树都会被展开 —— 看起来就像"所有目录都展开了"。
+ * 这里先把这条宽松规则收掉，再单独放行「直接子级」，保证一次只展开一层。
+ *
+ * 另外主题在 <=900px 时用 display:block !important 强制展开全部层级，
+ * 同样在这里收窄，让宽窄屏行为一致。
+ */
+#aside-content #card-toc .toc-content:not(.is-expand) .toc-child {
+  display: none;
+}
+
+#aside-content #card-toc .toc-content:not(.is-expand) .toc-item.active .toc-child {
+  display: none;
+}
+
+#aside-content #card-toc .toc-content:not(.is-expand) .toc-item.active > .toc-child {
+  display: block;
+}
+
+@media (max-width: 900px) {
+  #aside-content #card-toc .toc-content:not(.is-expand) .toc-child {
+    display: none !important;
+  }
+
+  #aside-content #card-toc .toc-content:not(.is-expand) .toc-item.active .toc-child {
+    display: none !important;
+  }
+
+  #aside-content #card-toc .toc-content:not(.is-expand) .toc-item.active > .toc-child {
+    display: block !important;
+  }
+}
+
+/* ---------- 页面布局：全站主容器加宽 ---------- */
+/*
+ * 主题把内容容器 .layout 的最大宽度硬编码为 1200px（首页/文章/归档等
+ * 所有页面共用），这里统一放宽到 1400px；顶部横幅文字（#post-info）和
+ * 页脚导航列（#footer .footer-flex）按同样宽度对齐。
+ * 超宽屏（>=2000px）主题另有 max-width: 70% 的规则（2560 屏下约 1792px）
+ * 会盖过上面的值，这里一并锁到 1400px。
+ */
+.layout,
+#page-header #post-info > *,
+#footer .footer-flex {
+  max-width: 1400px;
+}
+
+@media screen and (min-width: 2000px) {
+  .layout {
+    max-width: 1400px;
+  }
+}
+
+/* 侧边栏宽度：主题默认 26%，调到 23%，主栏 flex 自动占剩余空间 */
+#aside-content {
+  width: 23%;
+}
+
+/* ---------- 亚克力 / 毛玻璃效果 ---------- */
+/*
+ * 思路来自社区教程：各页面卡片改半透明背景 + backdrop-filter 模糊，
+ * 叠在站点壁纸上形成亚克力质感。四个变量集中在这里，方便微调。
+ * 注意：教程里首页卡片用的 #recent-posts > .recent-post-item 直接子级
+ * 选择器在 Butterfly 5.7 里只能命中轮播图幻灯片（文章卡片外面多了一层
+ * .recent-post-items 包装），这里统一改成后代选择器。
+ */
+:root {
+  --trans-light: rgba(255, 255, 255, 0.88); /* 白天模式卡片背景（0.88 = 不透明度） */
+  --trans-dark: rgba(25, 25, 25, 0.88); /* 夜间模式卡片背景 */
+  --border-style: 1px solid rgb(169, 169, 169);
+  --backdrop-filter: blur(5px) saturate(150%); /* 亚克力模糊 + 提饱和 */
+  --card-meta-bg: rgba(0, 0, 0, 0.05); /* 首页卡片里分类/标签 chip 的底色 */
+  --card-meta-bg-hover: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] {
+  --card-meta-bg: rgba(255, 255, 255, 0.08);
+  --card-meta-bg-hover: rgba(255, 255, 255, 0.14);
+}
+
+/* 首页文章卡片（含轮播图幻灯片） */
+#recent-posts .recent-post-item {
+  background: var(--trans-light);
+  backdrop-filter: var(--backdrop-filter);
+  border-radius: 25px;
+  border: var(--border-style);
+}
+
+/* 个人信息卡片背景图（明暗双图） */
+[data-theme="light"] #aside-content > .card-widget.card-info {
+  background-image: url(https://sourcebucket.s3.ladydaily.com/img/snowflower.webp);
+  background-repeat: no-repeat;
+  background-attachment: inherit;
+  background-size: 100%;
+}
+
+[data-theme="dark"] #aside-content > .card-widget.card-info {
+  background-image: url(https://sourcebucket.s3.ladydaily.com/img/aurora.webp);
+  background-repeat: no-repeat;
+  background-attachment: inherit;
+  background-size: 100%;
+}
+
+/* 首页侧栏卡片 */
+#aside-content .card-widget {
+  background: var(--trans-light);
+  backdrop-filter: var(--backdrop-filter);
+  border-radius: 18px;
+  border: var(--border-style);
+}
+
+/* 文章页、归档页、普通页面 */
+div#post,
+div#page,
+div#archive {
+  background: var(--trans-light);
+  backdrop-filter: var(--backdrop-filter);
+  border: var(--border-style);
+  border-radius: 20px;
+}
+
+/* 导航栏（滚动吸顶后）；5.7 自带 blur(7px)，这里统一走变量 */
+#page-header.nav-fixed #nav {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: var(--backdrop-filter);
+}
+
+[data-theme="dark"] #page-header.nav-fixed #nav {
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* 夜间模式：卡片换深色底 */
+[data-theme="dark"] #recent-posts .recent-post-item,
+[data-theme="dark"] #aside-content .card-widget,
+[data-theme="dark"] div#post,
+[data-theme="dark"] div#archive,
+[data-theme="dark"] div#page {
+  background: var(--trans-dark);
+}
+
+/* 夜间模式页脚页头遮罩透明 */
+[data-theme="dark"] #footer::before {
+  background: transparent !important;
+}
+[data-theme="dark"] #page-header::before {
+  background: transparent !important;
+}
+
+/* 阅读模式 */
+.read-mode #aside-content .card-widget {
+  background: rgba(158, 204, 171, 0.5) !important;
+}
+.read-mode div#post {
+  background: rgba(158, 204, 171, 0.5) !important;
+}
+
+/* 夜间模式下的阅读模式 */
+[data-theme="dark"] .read-mode #aside-content .card-widget {
+  background: rgba(25, 25, 25, 0.9) !important;
+  color: #ffffff;
+}
+[data-theme="dark"] .read-mode div#post {
+  background: rgba(25, 25, 25, 0.9) !important;
+  color: #ffffff;
+}
+
+/* ---------- 壁纸页面（/wallpaper/） ---------- */
+/*
+ * 卡片网格：桌面三列、平板两列、手机单列；当前选中的卡片用主题色描边。
+ * 卡片由 /js/wallpaper.js 根据 sources 列表渲染。
+ */
+.wallpaper-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.wallpaper-card {
+  width: calc(33.333% - 11px);
+  margin: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.04);
+  border: 2px solid transparent;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.wallpaper-card:hover {
+  transform: translateY(-3px);
+}
+
+.wallpaper-card.active {
+  border-color: #49b1f5;
+}
+
+.wallpaper-card img {
+  display: block;
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+}
+
+.wallpaper-card figcaption {
+  text-align: center;
+  padding: 8px 6px;
+  font-size: 14px;
+}
+
+.wallpaper-reset-btn {
+  padding: 8px 22px;
+  border: none;
+  border-radius: 10px;
+  background: #49b1f5;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.wallpaper-reset-btn:hover {
+  opacity: 0.85;
+}
+
+@media screen and (max-width: 900px) {
+  .wallpaper-card {
+    width: calc(50% - 8px);
+  }
+}
+
+@media screen and (max-width: 572px) {
+  .wallpaper-card {
+    width: 100%;
+  }
+}
+
+/* ---------- 文章详情页：侧边栏只保留目录 ---------- */
+/*
+ * 主题在文章页的侧边栏会依次渲染作者卡片（.card-info）、公告卡片、
+ * 最新文章卡片（.card-recent-post）等，目录是其中的 #card-toc。
+ * 这里在文章页（#body-wrap.post）隐藏目录以外的所有卡片；
+ * 首页等其它页面的侧边栏不受影响。
+ */
+.post #aside-content .card-widget:not(#card-toc) {
+  display: none;
+}
+
+/* ---------- 首页区块垂直间距 ---------- */
+/*
+ * 轮播图（swiper 插件）和分类磁贴（magnet 插件）挂在 #recent-posts 下，
+ * 各占一层 .recent-post-item 包装（亚克力背景、圆角、overflow:hidden 都在
+ * 包装层上）。间距必须加在包装层与包装层之间——加在内部的 .blog-slider /
+ * #catalog_magnet 上只会被 overflow:hidden 困在卡片里，把卡片自己撑高，
+ * 外面看不到任何间隙。
+ * 仅用直接子级选择器，避免波及 .recent-post-items 里的文章卡片。
+ */
+#recent-posts > .recent-post-item {
+  margin-bottom: 25px;
+}

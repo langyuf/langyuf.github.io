@@ -1,0 +1,762 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Linux系统编程 | Pineapple</title><meta name="author" content="Langyuf"><meta name="copyright" content="Langyuf"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Linux系统编程一、gcc编译过程在使用gcc编译程序时，编译过程可以简要划分为4个阶段： 预处理 编译 汇编 链接  gcc只能编译c语言，不能编译c++语言.而g++既可以编译C++语言，也可以编译C语言. 1apt install build-essential 1234561.预处理(Pre-Processing)预处理阶段主要处理一些预处理指令，比如文件包括、宏定义、条件编译在预处理阶">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux系统编程">
+<meta property="og:url" content="https://langyuf.github.io/2026/10/04/code-study/Linux/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Pineapple">
+<meta property="og:description" content="Linux系统编程一、gcc编译过程在使用gcc编译程序时，编译过程可以简要划分为4个阶段： 预处理 编译 汇编 链接  gcc只能编译c语言，不能编译c++语言.而g++既可以编译C++语言，也可以编译C语言. 1apt install build-essential 1234561.预处理(Pre-Processing)预处理阶段主要处理一些预处理指令，比如文件包括、宏定义、条件编译在预处理阶">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/pytorch.webp">
+<meta property="article:published_time" content="2026-10-04T07:02:17.000Z">
+<meta property="article:modified_time" content="2026-10-10T09:36:19.253Z">
+<meta property="article:author" content="Langyuf">
+<meta property="article:tag" content="C++">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="gdb">
+<meta property="article:tag" content="指针">
+<meta property="article:tag" content="系统编程">
+<meta property="article:tag" content="进程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/pytorch.webp"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Linux系统编程",
+  "url": "https://langyuf.github.io/2026/10/04/code-study/Linux/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/",
+  "image": "https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/pytorch.webp",
+  "datePublished": "2026-10-04T07:02:17.000Z",
+  "dateModified": "2026-10-10T09:36:19.253Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Langyuf",
+      "url": "https://langyuf.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://langyuf.github.io/2026/10/04/code-study/Linux/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.7.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.3.1/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
+
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
+
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
+
+        try {
+          const data = JSON.parse(itemStr)
+
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
+          }
+
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!true && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Linux系统编程',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.7.0/style.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jetbrains-mono@1.0.6/css/jetbrains-mono.css"><!-- hexo injector head_end start --><link rel="stylesheet" href="/css/runtime.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="/css/animate.min.css" media="print" onload="this.media='screen'"><link rel="stylesheet" href="/css/swiper.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="/css/swiperstyle.css" media="print" onload="this.media='all'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 8.1.2"></head><body><div class="bg-animation" id="web_bg" style="background-image: url(https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/wallpaper/wallpaper-1.jpeg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/avatar/avatar.webp" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/site/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">24</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-book"></i><span> 文章</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 全部</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-tools"></i><span> 工具</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/software/"><i class="fa-fw fas fa-cube"></i><span> 软件合集</span></a></li><li><a class="site-page child" href="/navigation/"><i class="fa-fw fas fa-compass"></i><span> 网址导航</span></a></li><li><a class="site-page child" href="/wallpaper/"><i class="fa-fw fas fa-image"></i><span> 壁纸</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-language"></i><span> 语言</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/"><i class="fa-fw fas fa-home"></i><span> 中文</span></a></li><li><a class="site-page child" href="/en/"><i class="fa-fw fas fa-globe"></i><span> English</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: transparent;"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Pineapple</span></a><a class="nav-page-title" href="/"><span class="site-name">Linux系统编程</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-book"></i><span> 文章</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 全部</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-tools"></i><span> 工具</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/software/"><i class="fa-fw fas fa-cube"></i><span> 软件合集</span></a></li><li><a class="site-page child" href="/navigation/"><i class="fa-fw fas fa-compass"></i><span> 网址导航</span></a></li><li><a class="site-page child" href="/wallpaper/"><i class="fa-fw fas fa-image"></i><span> 壁纸</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-language"></i><span> 语言</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/"><i class="fa-fw fas fa-home"></i><span> 中文</span></a></li><li><a class="site-page child" href="/en/"><i class="fa-fw fas fa-globe"></i><span> English</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Linux系统编程</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-10-04T07:02:17.000Z" title="发表于 2026-10-04 15:02:17">2026-10-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-10-10T09:36:19.253Z" title="更新于 2026-10-10 17:36:19">2026-10-10</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Linux/">Linux</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">6.1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>22分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="Linux系统编程"><a href="#Linux系统编程" class="headerlink" title="Linux系统编程"></a>Linux系统编程</h1><h2 id="一、gcc编译过程"><a href="#一、gcc编译过程" class="headerlink" title="一、gcc编译过程"></a>一、gcc编译过程</h2><p>在使用gcc编译程序时，编译过程可以简要划分为4个阶段：</p>
+<pre><code>预处理
+编译
+汇编
+链接
+</code></pre>
+<p>gcc只能编译c语言，不能编译c++语言.而g++既可以编译C++语言，也可以编译C语言.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt install build-essential</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span>预处理(Pre-Processing)</span><br><span class="line">预处理阶段主要处理一些预处理指令，比如文件包括、宏定义、条件编译</span><br><span class="line">在预处理阶段，通过条件编译指令决定哪个程序段需要编译，那些不需要编译。为后面的编译工作做铺垫。</span><br><span class="line">这个阶段主要处理源文件中的<span class="meta">#indef、#<span class="keyword">include</span>和#<span class="keyword">define</span>预处理命令；</span></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> PARA(...) 是一种预处理指令，在编译之前执行。</span></span><br><span class="line">当我们在程序中定义了许多宏来控制源代码版本的时候，我们自己有可能都会忘记有没有正确的设置这些宏，此时我们可以用这条指令在编译的时候就进行检查。假设我们希望判断自己有没有在源代码的什么地方定义了_X86 这个宏可以用下面的方法</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2.</span>编译(Assembling)</span><br><span class="line">编译阶段进行语法分析、词法分析和语义分析，并且将代码优化后产生相应的汇编代码文件（ASCLL文件），即.s 文件。这个过程是整个程序构建的核心部分，也是最复杂的部分之一。</span><br><span class="line">输入：中间文件*.i</span><br><span class="line">输出：编译后生成汇编编语言文件*.s</span><br><span class="line"></span><br><span class="line">这个阶段对应的gcc命令如下：</span><br><span class="line"><span class="meta">#gcc -S(编译) test.i -o test.s（汇编编语言文件）</span></span><br><span class="line">说明：它通过对源文件test.c使用S选项来生成汇编文件test.s</span><br><span class="line"></span><br><span class="line"><span class="number">3.</span>汇编(Compiling)(x86,AT&amp;T)</span><br><span class="line">通过不同平台（Windows、Linux）的汇编器将汇编代码翻译成机器码，即生成二进制可重定向文件（.o）。</span><br><span class="line">    输入文件：汇编文件*.s</span><br><span class="line">	输出文件：二进制机器代码*.<span class="built_in">o</span>(二进制可重定位的目标文件)</span><br></pre></td></tr></table></figure>
+<pre><code>  任何一个源文件在进行编译阶段的时候会去产生符号表，符号表中存放的就是程序所产生的符号（例如：函数名，变量名等），
+	我们的编译阶段是不会去给符号分配正确的地址。这些符号都没有被分配地址，因此.o文件没有经过链接是无法执行的。
+这个阶段对应的gcc命令如下：
+#gcc -c（汇编） test.s -o test.o
+
+在功能上，预处理、编译、汇编是3个不同的阶段
+但gcc在实际操作时可以把这3个步骤合并为一个步骤来执行,即使用 -c选项：
+输入文件：源码*.c文件
+输出文件：二进制机器代码*.o
+这个阶段对应的gcc命令如下：
+ gcc –c test.c -o test.o  或:	gcc -c test.c
+
+4.链接(Linking)
+由于每个.o文件都有都有自己的代码段、bss段，堆，栈等，
+1、所以链接器首先将多个.o 文件相应的段进行合并，建立映射关系并且去合并符号表。（进行符号解析:所有对符号的引用，都要找到该符号定义的地方），符号解析完成后就是给符号分配虚拟地址。(符号重定向)
+</code></pre>
+<p>   	将分配好的虚拟地址与符号表中的定义的符号一一对应起来，使其成为正确的地址，<br>	使代码段的指令可以根据符号的地址执行相应的操作，最后由链接器生成可执行文件。<br>	符号解析<br>	输入文件：二进制机器码*.o文件<br>	输出文件：与其它的机器代码和库文件汇集成一个可执行的二进制代码文件（无后缀）
+	</p>
+<pre><code>这个阶段对应的gcc命令如下：
+#gcc （没有选项符号） test.o example.o -o test
+可用选项：
+-L 指定库路径
+-l （小写的L）指定库名称
+-I （大写的i）指定头文件所在路径
+-i 指定头文件名称
+</code></pre>
+<p>查看目标文件内容 objdump -t main.o</p>
+<h2 id="二、静态库与动态库"><a href="#二、静态库与动态库" class="headerlink" title="二、静态库与动态库"></a>二、静态库与动态库</h2><h3 id="2-1静态链接与动态链接比较"><a href="#2-1静态链接与动态链接比较" class="headerlink" title="2.1静态链接与动态链接比较"></a>2.1静态链接与动态链接比较</h3><p><strong>1）静态链接</strong></p>
+<pre><code>静态链接：由链接器在链接时将库的内容加入到可执行程序中。
+优点：
+-对运行环境的依赖性较小，具有较好的兼容性
+缺点：
+- 生成的程序比较大，需要更多的系统资源，在装入内存时会消耗更多的时间
+- 库函数有了更新，必须重新编译应用程序
+</code></pre>
+<p><strong>2）动态链接</strong></p>
+<pre><code>动态链接：连接器在链接时仅仅建立与所需库函数的之间的链接关系，在程序运行时才将所需资源调入可执行程序。
+优点：
+- 在需要的时候才会调入对应的资源函数
+- 简化程序的升级；有着较小的程序体积
+- 实现进程之间的资源共享（避免重复拷贝）
+缺点：
+- 依赖动态库，不能独立运行
+- 动态库依赖版本问题严重
+</code></pre>
+<p><strong>3）静态、动态编译对比</strong></p>
+<pre><code>系统默认采用动态链接的方式进行编译程序，若想采用静态编译，加入-static参数。
+</code></pre>
+<p>编译</p>
+<pre><code> gcc test.c -o test_share
+ gcc -static test.c -o test_static
+</code></pre>
+<h3 id="2-2静态库制作和使用"><a href="#2-2静态库制作和使用" class="headerlink" title="2.2静态库制作和使用"></a>2.2静态库制作和使用</h3><pre><code>静态库可以认为是一些目标代码的集合，是在可执行程序运行前就已经加入到执行码中，成为执行程序的一部分。
+
+按照习惯,一般以“.a”做为文件后缀名。静态库的命名一般分为三个部分：
+
+前缀：lib
+库名称：自己定义即可
+后缀：.a
+所以最终的静态库的名字应该为：libxxx.a
+</code></pre>
+<p>源文件–&gt;预编译–&gt;编译–&gt;汇编–&gt;目标文件–&gt;(编号、索引、打包)静态库</p>
+<p>步骤:</p>
+<p>1.将c源文件生成对应的.o文件</p>
+<pre><code>gcc -c add.c -o add.o 		gcc -c main.c -o main.o 
+</code></pre>
+<p>2.使用打包工具ar将准备好的.o文件打包为.a文件 libmain.a</p>
+<pre><code>ar -rcs libmain.a add.o main.o
+</code></pre>
+<p><strong>在使用ar工具是时候需要添加参数：rcs</strong></p>
+<ul>
+<li>r更新</li>
+<li>c创建</li>
+<li>s建立索引</li>
+</ul>
+<p>3.编译命令</p>
+<pre><code>	gcc main.c -L./ -I./ -lmain -o main
+</code></pre>
+<p>参数说明：</p>
+<ul>
+<li>-L：表示要连接的库所在目录</li>
+<li>-I.&#x2F;: I(大写i) 表示指定头文件的目录为当前目录</li>
+<li>-l(小写L)：指定链接时需要的库，去掉前缀和后缀</li>
+</ul>
+<h3 id="2-3动态库制作和使用"><a href="#2-3动态库制作和使用" class="headerlink" title="2.3动态库制作和使用"></a>2.3动态库制作和使用</h3><pre><code>共享库在程序编译时并不会被连接到目标代码中，而是在程序运行是才被载入。不同的应用程序如果调用相同的库，那么在内存里只需要有一份该共享库的实例，规避了空间浪费问题。
+
+动态库在程序运行是才被载入，也解决了静态库对程序的更新、部署和发布页会带来麻烦。用户只需要更新动态库即可，增量更新。
+
+按照习惯,一般以“.so”做为文件后缀名。共享库的命名一般分为三个部分：
+
+- 前缀：lib
+- 库名称：自己定义即可
+- 后缀：.so
+
+所以最终的动态库的名字应该为：libxxx.so
+</code></pre>
+<p>源代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//main.c</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&quot;add.h&quot;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,add(<span class="number">1</span>,<span class="number">2</span>));</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//add.c</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&quot;add.h&quot;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">add</span><span class="params">(<span class="type">int</span> a,<span class="type">int</span> b)</span>&#123;</span><br><span class="line">	<span class="keyword">return</span> a+b;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//add.h</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> __ADD_H__</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __ADD_H__</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">add</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y)</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span> </span></span><br></pre></td></tr></table></figure>
+
+<p>步骤:</p>
+<p>1.生成目标文件，此时要加编译选项：-fPIC（fpic）</p>
+<pre><code>gcc -fPIC -c main.c 		gcc -fPIC -c main.c
+</code></pre>
+<p>参数：-fPIC 创建与地址无关的编译程序（pic，position independent code），是为了能够在多个应用程序间共享。</p>
+<p>2.生成共享库，此时要加链接器选项: -shared（指定生成动态链接库）</p>
+<pre><code>gcc -shared add.o main.o -o libmain.so
+</code></pre>
+<p>ldd查看可执行文件的依赖的动态库</p>
+<p>3.引用动态库编译成可执行文件（跟静态库方式一样）</p>
+<pre><code>gcc  mian.c -L./ -I./ -lmain -o main
+</code></pre>
+<p>直接执行可能会报错(系统找不到动态库)</p>
+<pre><code>注:
+- 当系统加载可执行代码时候，能够知道其所依赖的库的名字，但是还需要知道绝对路径。此时就需要系统动态载入器(dynamic linker/loader)。
+- 对于elf格式的可执行程序，是由ld-linux.so*来完成的，它先后搜索elf文件的 DT_RPATH段 — 环境变量LD_LIBRARY_PATH — /etc/ld.so.cache文件列表 — **/lib/, /usr/lib**目录找到库文件后将其载入内存。
+</code></pre>
+<p><strong>解决方法</strong></p>
+<pre><code>1.拷贝自己制作的共享库到/lib或者/usr/lib(不能是/lib64目录)
+
+2.临时设置LD_LIBRARY_PATH：
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:库路径
+
+3.永久设置,把export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:库路径，设置到~/.bashrc或者 /etc/profile文件中
+	1.vim ~/.bashrc
+	2.最后一行添加如下内容:
+	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:绝对路径
+	3.使环境变量生效:  source ~/.bashrc
+
+4.将其添加到 /etc/ld.so.conf文件中,编辑/etc/ld.so.conf文件，加入库文件所在目录的路径
+运行sudo ldconfig -v，该命令会重建/etc/ld.so.cache文件
+	1.sudo vim /etc/ld.so.conf
+	2.文件最后添加动态库路径(绝对路径)
+	3.sudo ldconfig -v
+	
+5.使用符号链接， 但是一定要使用绝对路径
+ 	sudo ln -s 动态库路径(绝对路径) /lib/libtest.so
+</code></pre>
+<p>mkdefile文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">SRC=$(wildcard ./*.c)#找到当前目录下所有后缀为.c的文件,赋值给src</span><br><span class="line">OBJS=$(patsubst %.c,%.o,$(SRC))#把src变量里所有后缀为.c的文件替换成.o</span><br><span class="line">TARGET=main</span><br><span class="line"></span><br><span class="line">#这些变量不能单独使用 必须在命令中使用</span><br><span class="line">#$@	表示目标</span><br><span class="line">#$^	表示所有的依赖</span><br><span class="line">#$&lt;	表示第一个依赖</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$(TARGET):$(OBJS)</span><br><span class="line">	gcc -shared $^ -o lib$@.so</span><br><span class="line">	gcc -g  -Wall $@.c -L./ -l$@ -I./ -o $@</span><br><span class="line">	#gcc $(OBJS) -o $(TARGET)</span><br><span class="line"></span><br><span class="line">#模式匹配 所有的.o都依赖对应的.c</span><br><span class="line">#将所有的.c 生成对应的.o</span><br><span class="line">%.o:%.c</span><br><span class="line">	gcc -fPIC -c $&lt;</span><br><span class="line">	#gcc -c $&lt; -o $@</span><br><span class="line"></span><br><span class="line">#声明clean为伪目标 伪目标不去判断目标文件是否存在或者已经更新 </span><br><span class="line">#无条件执行命令</span><br><span class="line">.PHONY:clean</span><br><span class="line">clean:</span><br><span class="line">	-rm -rf $(OBJS) $(TARGET) *.so </span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3ssh"><a href="#2-3ssh" class="headerlink" title="2.3ssh"></a>2.3ssh</h3><p>.更新可用软件包列表</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt update</span><br></pre></td></tr></table></figure>
+<p>更新已安装的包</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt upgrade</span><br></pre></td></tr></table></figure>
+<p>步骤 1：删除并重新安装 SSH 服务</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">apt remove --purge openssh-server   # 删除 openssh-server 包</span><br><span class="line">apt install openssh-server          # 重新安装 openssh-server</span><br><span class="line">rm /etc/ssh/ssh_config                  # 删除 SSH 配置文件</span><br><span class="line">service ssh --full-restart             # 重启 SSH 服务</span><br></pre></td></tr></table></figure>
+
+<p>步骤 2：修改 SSH 配置</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/ssh/sshd_config</span><br></pre></td></tr></table></figure>
+<p>添加以下行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Port 6666                              # 修改 SSH 服务端口为 6666</span><br><span class="line">ListenAddress 0.0.0.0                  # 监听所有 IP 地址</span><br><span class="line">PasswordAuthentication yes             # 启用密码认证</span><br></pre></td></tr></table></figure>
+<p>步骤 3：重启 SSH 服务</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service ssh --full-restart</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3g-调试"><a href="#2-3g-调试" class="headerlink" title="2.3g++调试"></a>2.3g++调试</h3><h2 id="三、GDB调试器"><a href="#三、GDB调试器" class="headerlink" title="三、GDB调试器"></a>三、GDB调试器</h2><h3 id="3-1生成调试信息"><a href="#3-1生成调试信息" class="headerlink" title="3.1生成调试信息"></a>3.1生成调试信息</h3><p>一般来说GDB主要调试的是C&#x2F;C++的程序。要调试C&#x2F;C++的程序，首先在编译时，我们必须要把调试信息加到可执行文件中。使用编译器（cc&#x2F;gcc&#x2F;g++）的 -g 参数可以做到这一点。如：</p>
+<blockquote>
+<p>gcc -g hello.c -o hello<br>g++ -g hello.cpp -o hello</p>
+</blockquote>
+<h3 id="3-2启动GDB"><a href="#3-2启动GDB" class="headerlink" title="3.2启动GDB"></a>3.2启动GDB</h3><ul>
+<li><p>启动gdb:gdb program</p>
+<p>program 也就是你的执行文件，一般在当前目录下。</p>
+</li>
+<li><p>设置运行参数</p>
+<p>set args 可指定运行时参数。（如：set args 10 20 30 40 50 ）</p>
+<p>show args 命令可以查看设置好的运行参数。</p>
+</li>
+<li><p>启动程序</p>
+<p>run： 程序开始执行，如果有断点，停在第一个断点处</p>
+<p>start： 程序向下执行一行。</p>
+</li>
+</ul>
+<h3 id="3-3显示源代码"><a href="#3-3显示源代码" class="headerlink" title="3.3显示源代码"></a>3.3显示源代码</h3><p>用list命令来打印程序的源代码。默认打印10行。</p>
+<pre><code> list linenum： 打印第linenm行的上下文内容.
+
+ list function： 显示函数名为function的函数的源程序。
+
+ list： 显示当前行后面的源程序。
+
+ list -： 显示当前行前面的源程序。
+
+一般是打印当前行的上5行和下5行，如果显示函数是是上2行下8行，默认是10行，当然，你也可以定制显示的范围，使用下面命令可以设置一次显示源程序的行数。
+set listsize count：设置一次显示源代码的行数。
+show listsize： 查看当前listsize的设置。
+</code></pre>
+<h3 id="3-4断点操作"><a href="#3-4断点操作" class="headerlink" title="3.4断点操作"></a>3.4断点操作</h3><p><strong>1）简单断点</strong></p>
+<p>break 设置断点，可以简写为b</p>
+<p>Ø b 10 设置断点，在源程序第10行</p>
+<p>Ø b func 设置断点，在func函数入口处</p>
+<p><strong>2）多文件设置断点</strong></p>
+<p>C++中可以使用class::function或function(type,type)格式来指定函数名。</p>
+<p>如果有名称空间，可以使用namespace::class::function或者function(type,type)格式来指定函数名。</p>
+<p>Ø break filename:linenum – 在源文件filename的linenum行处停住</p>
+<p>Ø break filename:function – 在源文件filename的function函数的入口处停住</p>
+<p>Ø break class::function或function(type,type) – 在类class的function函数的入口处停住</p>
+<p>Ø break namespace::class::function – 在名称空间为namespace的类class的function函数的入口处停住</p>
+<p><strong>3）查询所有断点</strong></p>
+<ul>
+<li>info b</li>
+<li>info break</li>
+<li>i break</li>
+<li>i b</li>
+</ul>
+<h3 id="3-5条件断点"><a href="#3-5条件断点" class="headerlink" title="3.5条件断点"></a>3.5条件断点</h3><p>一般来说，为断点设置一个条件，我们使用if关键词，后面跟其断点条件。</p>
+<p>设置一个条件断点：</p>
+<blockquote>
+<p>b test.c:8 if Value &#x3D;&#x3D; 5</p>
+</blockquote>
+<h3 id="3-6维护断点"><a href="#3-6维护断点" class="headerlink" title="3.6维护断点"></a>3.6维护断点</h3><p>1）delete [range…] 删除指定的断点，其简写命令为d。</p>
+<ul>
+<li>如果不指定断点号，则表示删除所有的断点。range表示断点号的范围（如：3-7）。</li>
+<li>比删除更好的一种方法是disable停止点，disable了的停止点，GDB不会删除，当你还需要时，enable即可，就好像回收站一样。</li>
+</ul>
+<p>2） disable [range…] 使指定断点无效，简写命令是dis。</p>
+<p>如果什么都不指定，表示disable所有的停止点。</p>
+<p>3） enable [range…] 使无效断点生效，简写命令是ena。</p>
+<p>如果什么都不指定，表示enable所有的停止点。</p>
+<h3 id="3-7调试代码"><a href="#3-7调试代码" class="headerlink" title="3.7调试代码"></a>3.7调试代码</h3><ul>
+<li>run 运行程序，可简写为r</li>
+<li>next 单步跟踪，函数调用当作一条简单语句执行，可简写为n</li>
+<li>step 单步跟踪，函数调进入被调用函数体内，可简写为s</li>
+<li>finish 退出进入的函数</li>
+<li>until 在一个循环体内单步跟踪时，这个命令可以运行程序直到退出循环体,可简写为u。</li>
+<li>continue 继续运行程序，停在下一个断点的位置，可简写为c</li>
+<li>quit 退出gdb，可简写为q</li>
+</ul>
+<h3 id="3-8数据查看"><a href="#3-8数据查看" class="headerlink" title="3.8数据查看"></a>3.8数据查看</h3><p>1）查看运行时数据</p>
+<p>print 打印变量、字符串、表达式等的值，可简写为p</p>
+<p>p count 打印count的值</p>
+<h3 id="3-9自动显示"><a href="#3-9自动显示" class="headerlink" title="3.9自动显示"></a>3.9自动显示</h3><p>你可以<strong>设置一些自动显示的变量</strong>，当程序停住时，或是在你单步跟踪时，这些变量会自动显示。相关的GDB命令是display。</p>
+<ul>
+<li>display 变量名</li>
+<li>info display – 查看display设置的自动显示的信息。</li>
+<li>undisplay num（info display时显示的编号）</li>
+<li>delete display dnums… – 删除自动显示，dnums意为所设置好了的自动显式的编号。如果要同时删除几个，编号可以用空格分隔，如果要删除一个范围内的编号，可以用减号表示（如：2-5）</li>
+<li>disable display dnums…</li>
+<li>enable display dnums…</li>
+<li>disable和enalbe不删除自动显示的设置，而只是让其失效和恢复。</li>
+</ul>
+<h3 id="3-10-查看修改变量的值"><a href="#3-10-查看修改变量的值" class="headerlink" title="3.10 查看修改变量的值"></a>3.10 查看修改变量的值</h3><p>1）ptype width – 查看变量width的类型</p>
+<p>type &#x3D; double</p>
+<p>2）p width – 打印变量width 的值</p>
+<p>$4 &#x3D; 13</p>
+<p>你可以使用set var命令来告诉GDB，width不是你GDB的参数，而是程序的变量名，如：</p>
+<p>set var width&#x3D;47 &#x2F;&#x2F; 将变量var值设置为47</p>
+<p><strong>在你改变程序变量取值时，最好都使用set var格式的GDB命令</strong></p>
+<h2 id="四、文件操作相关函数"><a href="#四、文件操作相关函数" class="headerlink" title="四、文件操作相关函数"></a>四、文件操作相关函数</h2><h3 id="4-1-stat函数-重点"><a href="#4-1-stat函数-重点" class="headerlink" title="4.1 stat函数(重点)"></a>4.1 stat函数(重点)</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">stat</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="keyword">struct</span> stat *buf)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">lstat</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="keyword">struct</span> stat *buf)</span>;</span><br><span class="line">功能：</span><br><span class="line">    获取文件状态信息</span><br><span class="line">    stat和lstat的区别：</span><br><span class="line">        当文件是一个符号链接时，lstat返回的是该符号链接本身的信息；</span><br><span class="line">        而stat返回的是该链接指向的文件的信息。</span><br><span class="line">参数：</span><br><span class="line">    path：文件名</span><br><span class="line">    buf：保存文件信息的结构体</span><br><span class="line">返回值：</span><br><span class="line">    成功： <span class="number">0</span></span><br><span class="line">    失败: <span class="number">-1</span></span><br></pre></td></tr></table></figure>
+
+<p>struct stat结构体说明：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">stat</span> &#123;</span></span><br><span class="line">    <span class="type">dev_t</span>           st_dev;     <span class="comment">//文件的设备编号</span></span><br><span class="line">    <span class="type">ino_t</span>           st_ino;     <span class="comment">//节点</span></span><br><span class="line">    <span class="type">mode_t</span>          st_mode;            <span class="comment">//文件的类型和存取的权限</span></span><br><span class="line">    <span class="type">nlink_t</span>         st_nlink;       <span class="comment">//连到该文件的硬连接数目，刚建立的文件值为1</span></span><br><span class="line">    <span class="type">uid_t</span>           st_uid;     <span class="comment">//用户ID</span></span><br><span class="line">    <span class="type">gid_t</span>           st_gid;     <span class="comment">//组ID</span></span><br><span class="line">    <span class="type">dev_t</span>           st_rdev;        <span class="comment">//(设备类型)若此文件为设备文件，则为其设备编号</span></span><br><span class="line">    <span class="type">off_t</span>           st_size;        <span class="comment">//文件字节数(文件大小)</span></span><br><span class="line">    <span class="type">blksize_t</span>       st_blksize;     <span class="comment">//块大小(文件系统的I/O 缓冲区大小)</span></span><br><span class="line">    <span class="type">blkcnt_t</span>        st_blocks;      <span class="comment">//块数</span></span><br><span class="line">    <span class="type">time_t</span>          st_atime;       <span class="comment">//最后一次访问时间</span></span><br><span class="line">    <span class="type">time_t</span>          st_mtime;       <span class="comment">//最后一次修改时间</span></span><br><span class="line">    <span class="type">time_t</span>          st_ctime;       <span class="comment">//最后一次改变时间(指属性)</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<img src="C:\Users\wang\AppData\Roaming\Typora\typora-user-images\image-20241105211719301.png" alt="image-20241105211719301" style="zoom:50%;" />
+
+<p>示例:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">stat</span> <span class="title">buf</span>;</span></span><br><span class="line">    stat(<span class="string">&quot;a.txt&quot;</span>, &amp;buf);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (S_ISREG(buf.st_mode))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;这是普通文件&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="4-2-access函数"><a href="#4-2-access函数" class="headerlink" title="4.2 access函数"></a>4.2 access函数</h3><pre><code>#include &lt;unistd.h&gt;
+int access(const char *pathname, int mode);
+功能：测试指定文件是否具有某种属性
+参数：
+   pathname：文件名
+   mode：文件权限，4种权限
+      R_OK：   是否有读权限
+      W_OK：   是否有写权限
+      X_OK：   是否有执行权限
+      F_OK：   测试文件是否存在
+返回值：
+  0：  有某种权限，或者文件存在
+  -1：没有，或文件不存在
+
+access(&quot;txt&quot;, F_OK);
+</code></pre>
+<h3 id="4-3chmod函数"><a href="#4-3chmod函数" class="headerlink" title="4.3chmod函数"></a>4.3chmod函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line">​</span><br><span class="line"><span class="type">int</span> <span class="title function_">chmod</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">mode_t</span> mode)</span>;</span><br><span class="line">功能：修改文件权限</span><br><span class="line">参数：</span><br><span class="line">    filename：文件名</span><br><span class="line">    mode：权限(<span class="number">8</span>进制数)</span><br><span class="line">返回值：</span><br><span class="line">    成功：<span class="number">0</span></span><br><span class="line">    失败：<span class="number">-1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-4-chown函数"><a href="#4-4-chown函数" class="headerlink" title="4.4 chown函数"></a>4.4 chown函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line">​</span><br><span class="line"><span class="type">int</span> <span class="title function_">chown</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">uid_t</span> owner, <span class="type">gid_t</span> group)</span>;</span><br><span class="line">功能：修改文件所有者和所属组</span><br><span class="line">参数：</span><br><span class="line">    pathname：文件或目录名</span><br><span class="line">    owner：文件所有者id，通过查看 /etc/passwd 得到所有者id</span><br><span class="line">    group：文件所属组id，通过查看 /etc/group 得到用户组id</span><br><span class="line">返回值：</span><br><span class="line">    成功：<span class="number">0</span></span><br><span class="line">    失败：<span class="number">-1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-5-truncate函数"><a href="#4-5-truncate函数" class="headerlink" title="4.5 truncate函数"></a>4.5 truncate函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line">​</span><br><span class="line"><span class="type">int</span> <span class="title function_">truncate</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">off_t</span> length)</span>;</span><br><span class="line">功能：修改文件大小</span><br><span class="line">参数：</span><br><span class="line">    path：文件文件名字</span><br><span class="line">    length：指定的文件大小</span><br><span class="line">        a)比原来小, 删掉后边的部分</span><br><span class="line">        b)比原来大, 向后拓展</span><br><span class="line">返回值：</span><br><span class="line">    成功：<span class="number">0</span></span><br><span class="line">    失败：<span class="number">-1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-6-link函数"><a href="#4-6-link函数" class="headerlink" title="4.6 link函数"></a>4.6 link函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line">​</span><br><span class="line"><span class="type">int</span> <span class="title function_">link</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *oldpath, <span class="type">const</span> <span class="type">char</span> *newpath)</span>;</span><br><span class="line">功能：创建一个硬链接</span><br><span class="line">参数：</span><br><span class="line">    oldpath：源文件名字</span><br><span class="line">    newpath：硬链接名字</span><br><span class="line">返回值：</span><br><span class="line">    成功：<span class="number">0</span></span><br><span class="line">    失败：<span class="number">-1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-7-symlink函数"><a href="#4-7-symlink函数" class="headerlink" title="4.7 symlink函数"></a>4.7 symlink函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line">​</span><br><span class="line"><span class="type">int</span> <span class="title function_">symlink</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *target, <span class="type">const</span> <span class="type">char</span> *linkpath)</span>;</span><br><span class="line">功能：创建一个软链接</span><br><span class="line">参数：</span><br><span class="line">    target：源文件名字</span><br><span class="line">    linkpath：软链接名字</span><br><span class="line">返回值：</span><br><span class="line">    成功：<span class="number">0</span></span><br><span class="line">    失败：<span class="number">-1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-8-readlink函数"><a href="#4-8-readlink函数" class="headerlink" title="4.8 readlink函数"></a>4.8 readlink函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line">​</span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">readlink</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">char</span> *buf, <span class="type">size_t</span> bufsiz)</span>;</span><br><span class="line">功能：读软连接对应的文件名，不是读内容(该函数只能读软链接文件)</span><br><span class="line">参数：</span><br><span class="line">    pathname：软连接名</span><br><span class="line">    buf：存放软件对应的文件名</span><br><span class="line">    bufsiz ：缓冲区大小(第二个参数存放的最大字节数)</span><br><span class="line">返回值：</span><br><span class="line">    成功：&gt;<span class="number">0</span>，读到buf中的字符个数</span><br><span class="line">    失败：<span class="number">-1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-9-unlink函数"><a href="#4-9-unlink函数" class="headerlink" title="4.9 unlink函数"></a>4.9 unlink函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line">​</span><br><span class="line"><span class="type">int</span> <span class="title function_">unlink</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname)</span>;</span><br><span class="line">功能：删除一个文件(软硬链接文件)</span><br><span class="line">参数：</span><br><span class="line">    pathname：删除的文件名字</span><br><span class="line">返回值：</span><br><span class="line">    成功：<span class="number">0</span></span><br><span class="line">    失败：<span class="number">-1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-10-rename函数"><a href="#4-10-rename函数" class="headerlink" title="4.10 rename函数"></a>4.10 rename函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line">​</span><br><span class="line"><span class="type">int</span> <span class="title function_">rename</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *oldpath, <span class="type">const</span> <span class="type">char</span> *newpath)</span>;</span><br><span class="line">功能：把oldpath的文件名改为newpath</span><br><span class="line">参数：</span><br><span class="line">oldpath：旧文件名</span><br><span class="line">newpath：新文件名</span><br><span class="line">返回值：</span><br><span class="line">成功：<span class="number">0</span></span><br><span class="line">失败：<span class="number">-1</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="五、文件描述符操作-重点"><a href="#五、文件描述符操作-重点" class="headerlink" title="五、文件描述符操作(重点)"></a>五、文件描述符操作(重点)</h2><pre><code>dup() 和 dup2() 是两个非常有用的系统调用，都是用来复制一个文件的描述符，使新的文件描述符也标识旧的文件描述符所标识的文件。
+
+这个过程类似于现实生活中的配钥匙，钥匙相当于文件描述符，锁相当于文件，本来一个钥匙开一把锁，相当于，一个文件描述符对应一个文件，现在，我们去配钥匙，通过旧的钥匙复制了一把新的钥匙，这样的话，旧的钥匙和新的钥匙都能开启这把锁。
+
+对比于 dup(), dup2() 也一样，通过原来的文件描述符复制出一个新的文件描述符，这样的话，原来的文件描述符和新的文件描述符都指向同一个文件，我们操作这两个文件描述符的任何一个，都能操作它所对应的文件。
+</code></pre>
+<h3 id="5-1-dup函数"><a href="#5-1-dup函数" class="headerlink" title="5.1 dup函数"></a>5.1 dup函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line">​</span><br><span class="line"><span class="type">int</span> <span class="title function_">dup</span><span class="params">(<span class="type">int</span> oldfd)</span>;</span><br><span class="line">功能：</span><br><span class="line">    通过 oldfd 复制出一个新的文件描述符，新的文件描述符是调用进程文件描述符表中最小可用的文件描述符，最终 oldfd 和新的文件描述符都指向同一个文件。</span><br><span class="line">参数：</span><br><span class="line">    oldfd : 需要复制的文件描述符 oldfd</span><br><span class="line">返回值：</span><br><span class="line">        成功：新文件描述符</span><br><span class="line">        失败： <span class="number">-1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="5-2-dup2函数"><a href="#5-2-dup2函数" class="headerlink" title="5.2 dup2函数"></a>5.2 dup2函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line">​</span><br><span class="line"><span class="type">int</span> <span class="title function_">dup2</span><span class="params">(<span class="type">int</span> oldfd, <span class="type">int</span> newfd)</span>;</span><br><span class="line">功能：</span><br><span class="line">    通过 oldfd 复制出一个新的文件描述符 newfd，如果成功，newfd 和函数返回值是同一个返回值，最终 oldfd 和新的文件描述符 newfd 都指向同一个文件。</span><br><span class="line">参数：</span><br><span class="line">    oldfd : 需要复制的文件描述符</span><br><span class="line">    newfd : 新的文件描述符，这个描述符可以人为指定一个合法数字（<span class="number">0</span> - <span class="number">1023</span>），如果指定的数字已经被占用（和某个文件有关联），此函数会自动关闭 close() 断开这个数字和某个文件的关联，再来使用这个合法数字。</span><br><span class="line">返回值：</span><br><span class="line">    成功：返回 newfd</span><br><span class="line">    失败：返回 <span class="number">-1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="5-3-fcnlt函数"><a href="#5-3-fcnlt函数" class="headerlink" title="5.3 fcnlt函数"></a>5.3 fcnlt函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line">​</span><br><span class="line"><span class="type">int</span> <span class="title function_">fcntl</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span> cmd, ... <span class="comment">/* arg */</span>)</span>;</span><br><span class="line">功能：改变已打开的文件性质，fcntl针对描述符提供控制。</span><br><span class="line">参数：</span><br><span class="line">    fd：操作的文件描述符</span><br><span class="line">    cmd：操作方式</span><br><span class="line">    arg：针对cmd的值，fcntl能够接受第三个参数<span class="type">int</span> arg。</span><br><span class="line">返回值：</span><br><span class="line">    成功：返回某个其他值</span><br><span class="line">    失败：<span class="number">-1</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>fcntl函数有5种功能：
+
+1) 复制一个现有的描述符（cmd=F_DUPFD）
+
+2) 获得／设置文件描述符标记(cmd=F_GETFD或F_SETFD)
+
+3) 获得／设置文件状态标记(cmd=F_GETFL或F_SETFL)
+
+4) 获得／设置异步I/O所有权(cmd=F_GETOWN或F_SETOWN)
+
+5) 获得／设置记录锁(cmd=F_GETLK, F_SETLK或F_SETLKW)
+</code></pre>
+<p>示例:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 等价于dup()</span></span><br><span class="line">    <span class="type">int</span> new_fd = fcntl(fd, F_DUPFD, <span class="number">0</span>);</span><br><span class="line">​</span><br><span class="line">    <span class="comment">// 获取文件状态标志</span></span><br><span class="line">    <span class="type">int</span> flag = fcntl(fd, F_GETFL, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">switch</span> (flag &amp; O_ACCMODE)</span><br><span class="line">    &#123;</span><br><span class="line">    <span class="keyword">case</span> O_RDONLY:</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;read only\n&quot;</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> O_WRONLY:</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;write only\n&quot;</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> O_RDWR:</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;read and write\n&quot;</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">​</span><br><span class="line">    <span class="keyword">if</span> (flag &amp; O_APPEND)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;append\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">​</span><br><span class="line">    flag |= O_APPEND; <span class="comment">// 追加flag</span></span><br><span class="line">    fcntl(fd, F_SETFL, flag); <span class="comment">//设置文件状态标记</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="六-目录相关操作-掌握"><a href="#六-目录相关操作-掌握" class="headerlink" title="六. 目录相关操作(掌握)"></a>六. 目录相关操作(掌握)</h2><h3 id="6-1-getcwd函数"><a href="#6-1-getcwd函数" class="headerlink" title="6.1 getcwd函数"></a>6.1 getcwd函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line">​</span><br><span class="line"><span class="type">char</span> *<span class="title function_">getcwd</span><span class="params">(<span class="type">char</span> *buf, <span class="type">size_t</span> size)</span>;</span><br><span class="line">功能：获取当前进程的工作目录</span><br><span class="line">参数：</span><br><span class="line">    buf : 缓冲区，存储当前的工作目录</span><br><span class="line">    size : 缓冲区大小</span><br><span class="line">返回值：</span><br><span class="line">    成功：buf中保存当前进程工作目录位置</span><br><span class="line">    失败：<span class="literal">NULL</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="6-2-chdir函数"><a href="#6-2-chdir函数" class="headerlink" title="6.2 chdir函数"></a>6.2 chdir函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line">​</span><br><span class="line"><span class="type">int</span> <span class="title function_">chdir</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path)</span>;</span><br><span class="line">功能：修改当前进程(应用程序)的路径</span><br><span class="line">参数：</span><br><span class="line">    path：切换的路径</span><br><span class="line">返回值：</span><br><span class="line">    成功：<span class="number">0</span></span><br><span class="line">    失败：<span class="number">-1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="6-3-opendir函数"><a href="#6-3-opendir函数" class="headerlink" title="6.3 opendir函数"></a>6.3 opendir函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;dirent.h&gt;</span></span></span><br><span class="line">​</span><br><span class="line">DIR *<span class="title function_">opendir</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line">功能：打开一个目录</span><br><span class="line">参数：</span><br><span class="line">    name：目录名</span><br><span class="line">返回值：</span><br><span class="line">    成功：返回指向该目录结构体指针</span><br><span class="line">    失败：<span class="literal">NULL</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="6-4-closedir函数"><a href="#6-4-closedir函数" class="headerlink" title="6.4 closedir函数"></a>6.4 closedir函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;dirent.h&gt;</span></span></span><br><span class="line">​</span><br><span class="line"><span class="type">int</span> <span class="title function_">closedir</span><span class="params">(DIR *dirp)</span>;</span><br><span class="line">功能：关闭目录</span><br><span class="line">参数：</span><br><span class="line">    dirp：opendir返回的指针</span><br><span class="line">返回值：</span><br><span class="line">    成功：<span class="number">0</span></span><br><span class="line">    失败：<span class="number">-1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="6-5-readdir函数"><a href="#6-5-readdir函数" class="headerlink" title="6.5 readdir函数"></a>6.5 readdir函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;dirent.h&gt;</span></span></span><br><span class="line">​</span><br><span class="line"><span class="keyword">struct</span> dirent *<span class="title function_">readdir</span><span class="params">(DIR *dirp)</span>;</span><br><span class="line">功能：读取目录</span><br><span class="line">参数：</span><br><span class="line">    dirp：opendir的返回值</span><br><span class="line">返回值：</span><br><span class="line">    成功：目录结构体指针</span><br><span class="line">    失败：<span class="literal">NULL</span></span><br></pre></td></tr></table></figure>
+
+<p>相关结构体说明：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">dirent</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">ino_t</span> d_ino;                  <span class="comment">// 此目录进入点的inode</span></span><br><span class="line">    <span class="type">off_t</span> d_off;                    <span class="comment">// 目录文件开头至此目录进入点的位移</span></span><br><span class="line">    <span class="type">signed</span> <span class="type">short</span> <span class="type">int</span> d_reclen;      <span class="comment">// d_name 的长度, 不包含NULL 字符</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> d_type;           <span class="comment">// d_type 所指的文件类型 </span></span><br><span class="line">    <span class="type">char</span> d_name[<span class="number">256</span>];               <span class="comment">// 文件名</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>d_type文件类型说明：</p>
+<table>
+<thead>
+<tr>
+<th align="left"><strong>取值</strong></th>
+<th align="left"><strong>含义</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">DT_BLK</td>
+<td align="left">块设备</td>
+</tr>
+<tr>
+<td align="left">DT_CHR</td>
+<td align="left">字符设备</td>
+</tr>
+<tr>
+<td align="left">DT_DIR</td>
+<td align="left">目录</td>
+</tr>
+<tr>
+<td align="left">DT_LNK</td>
+<td align="left">软链接</td>
+</tr>
+<tr>
+<td align="left">DT_FIFO</td>
+<td align="left">管道</td>
+</tr>
+<tr>
+<td align="left">DT_REG</td>
+<td align="left">普通文件</td>
+</tr>
+<tr>
+<td align="left">DT_SOCK</td>
+<td align="left">套接字</td>
+</tr>
+<tr>
+<td align="left">DT_UNKNOWN</td>
+<td align="left">未知</td>
+</tr>
+</tbody></table>
+<h2 id="七-时间相关函数"><a href="#七-时间相关函数" class="headerlink" title="七. 时间相关函数"></a>七. 时间相关函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"> <span class="type">char</span> *<span class="title function_">asctime</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> tm *tm)</span>;</span><br><span class="line">   <span class="type">char</span> *<span class="title function_">asctime_r</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> tm *tm, <span class="type">char</span> *buf)</span>;</span><br><span class="line">​</span><br><span class="line">   <span class="type">char</span> *<span class="title function_">ctime</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep)</span>;</span><br><span class="line">   <span class="type">char</span> *<span class="title function_">ctime_r</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep, <span class="type">char</span> *buf)</span>;</span><br><span class="line">​</span><br><span class="line">   <span class="keyword">struct</span> tm *<span class="title function_">gmtime</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep)</span>;</span><br><span class="line">   <span class="keyword">struct</span> tm *<span class="title function_">gmtime_r</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep, <span class="keyword">struct</span> tm *result)</span>;</span><br><span class="line">​</span><br><span class="line">   <span class="keyword">struct</span> tm *<span class="title function_">localtime</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep)</span>;</span><br><span class="line">   <span class="keyword">struct</span> tm *<span class="title function_">localtime_r</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep, <span class="keyword">struct</span> tm *result)</span>;</span><br><span class="line">​</span><br><span class="line">   <span class="type">time_t</span> <span class="title function_">mktime</span><span class="params">(<span class="keyword">struct</span> tm *tm)</span>;</span><br><span class="line"> </span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://langyuf.github.io">Langyuf</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://langyuf.github.io/2026/10/04/code-study/Linux/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/">https://langyuf.github.io/2026/10/04/code-study/Linux/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://langyuf.github.io" target="_blank">Pineapple</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/C/">C++</a><a class="post-meta__tags" href="/tags/%E6%8C%87%E9%92%88/">指针</a><a class="post-meta__tags" href="/tags/%E8%BF%9B%E7%A8%8B/">进程</a><a class="post-meta__tags" href="/tags/Linux/">Linux</a><a class="post-meta__tags" href="/tags/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/">系统编程</a><a class="post-meta__tags" href="/tags/gdb/">gdb</a></div><div class="post-share"><div class="social-share" data-image="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/pytorch.webp" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/10/04/code-study/Linux/Linux%E7%BA%BF%E7%A8%8B/" title="Linux线程"><img class="cover" src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/cpp.webp" onerror="onerror=null;src='https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/site/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Linux线程</div></div><div class="info-2"><div class="info-item-1">Linux线程1 线程概念在许多经典的操作系统教科书中，总是把进程定义为程序的执行实例，它并不执行什么, 只是维护应用程序所需的各种资源，而线程则是真正的执行实体。 所以，线程是轻量级的进程（LWP：light weight process），在Linux环境下线程的本质仍是进程。 为了让进程完成一定的工作，进程必须至少包含一个线程。 进程，直观点说，保存在硬盘上的程序运行以后，会在内存空间里形成一个独立的内存体，这个内存体有自己的地址空间，有自己的堆，上级挂靠单位是操作系统。操作系统会以进程为单位，分配系统资源，所以我们也说，**进程是CPU分配资源的最小单位**。  线程存在与进程当中(进程可以认为是线程的容器)，是操作系统调度执行的最小单位。说通俗点，线程就是干活的。  进程是具有一定独立功能的程序关于某个数据集合上的一次运行活动，进程是系统进行资源分配和调度的一个独立单位。  线程是进程的一个实体，是 CPU 调度和分派的基本单位，它是比进程更小的能独立运行的基本单位。线程自己基本上不拥有系统资源，只拥有一点在运行中必不可少的资源（如程序计数器，一组寄存器和栈），但是它可...</div></div></div></a><a class="pagination-related" href="/2026/10/04/code-study/CPP/c++%E5%A4%9A%E7%BA%BF%E7%A8%8B/" title="C++多线程"><img class="cover" src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/linux.webp" onerror="onerror=null;src='https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/site/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">C++多线程</div></div><div class="info-2"><div class="info-item-1">C++多线程一、线程基础1.1创建线程thread12345678910void fun1(void) &#123;	std::cout&lt;&lt; &quot;线程1&quot; &lt;&lt; std::endl;&#125;int main()&#123;	std::thread t1(fun1);	t1.join();	return 0;&#125;  1.2join(),detach(),joinable()jion() 当主线程运行结束，子线程并没有执行完毕也会被操作系统强行终止 join等待一个线程完成，如果该线程还未执行完毕，则当前线程（一般是主线程）将被阻塞，直到该线程执行完成，主线程才会继续执行。  代码示例: 12345678910111213void fun1(void) &#123;	std::cout&lt;&lt; &quot;线程1&quot; &lt;&lt; std::endl;&#125;int main()&#123;	std::thread t1(fun1);	t1.join();//如果没有会出现问题,出现问题的原因是因为主线程已...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/10/04/code-study/other/gdb/" title="GDB调试"><img class="cover" src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/linux.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-10-04</div><div class="info-item-2">GDB调试</div></div><div class="info-2"><div class="info-item-1">GDB调试1、注意当需要同时编译C与C++文件时推荐，gcc与g++分别编译，最后g++链接 123gcc -c c_part.c -o c_part.og++ -c cpp_part.cpp -o cpp_part.og++ c_part.o cpp_part.o -o app  C 头文件如果给 C++ 用，通常要加： 123456789#ifdef __cplusplusextern &quot;C&quot; &#123;#endifvoid foo(void);#ifdef __cplusplus&#125;#endif     选项 含义 作用 阶段 注意事项    -Wall 开启常用警告 提示未使用变量、类型不匹配、缺返回值等 编译 不是“所有警告”，建议和 -Wextra 一起用   -Wextra 开启额外警告 比 -Wall 更严格，如未使用参数、符号比较等 编译 常与 -Wall 搭配   -g 生成调试信息 让 GDB 能看到源码、行号、变量名、类型 编译 调试必备；-g3 可包含宏信息   -O0 关闭优化 源码与机器码基本一一对应，方便单步调试 编译...</div></div></div></a><a class="pagination-related" href="/2026/10/04/code-study/Linux/gbd%E8%B0%83%E8%AF%95/" title="GDB调试"><img class="cover" src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/ai.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-10-04</div><div class="info-item-2">GDB调试</div></div><div class="info-2"><div class="info-item-1">GDB调试1、注意当需要同时编译C与C++文件时推荐，gcc与g++分别编译，最后g++链接 123gcc -c c_part.c -o c_part.og++ -c cpp_part.cpp -o cpp_part.og++ c_part.o cpp_part.o -o app  C 头文件如果给 C++ 用，通常要加： 123456789#ifdef __cplusplusextern &quot;C&quot; &#123;#endifvoid foo(void);#ifdef __cplusplus&#125;#endif     选项 含义 作用 阶段 注意事项    -Wall 开启常用警告 提示未使用变量、类型不匹配、缺返回值等 编译 不是“所有警告”，建议和 -Wextra 一起用   -Wextra 开启额外警告 比 -Wall 更严格，如未使用参数、符号比较等 编译 常与 -Wall 搭配   -g 生成调试信息 让 GDB 能看到源码、行号、变量名、类型 编译 调试必备；-g3 可包含宏信息   -O0 关闭优化 源码与机器码基本一一对应，方便单步调试 编译...</div></div></div></a><a class="pagination-related" href="/2026/10/04/code-study/Linux/Linux%E8%BF%9B%E7%A8%8B/" title="linux进程"><img class="cover" src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/pytorch.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-10-04</div><div class="info-item-2">linux进程</div></div><div class="info-2"><div class="info-item-1">linux进程一. 进程和程序 (理解)程序是静态的，进程是动态的。 在 Linux 系统中，操作系统是通过进程去完成一个一个的任务，进程是管理事务的基本单元。  进程拥有自己独立的处理环境（如：当前需要用到哪些环境变量，程序运行的目录在哪，当前是哪个用户在运行此程序等）和系统资源（如：处理器 CPU 占用率、存储器、I/O设备、数据、程序）。  ​	​	并行(parallel)：指在同一时刻，有多条指令在多个处理器上同时执行。​	​	并发(concurrency)：指在同一时刻只能有一条指令执行，但多个进程指令被快速的轮换执行，使得在宏观上具有多个进程同时执行的效果，但在微观上并不是同时执行的，只是把时间分成若干段，使多个进程快速交替的执行。 二.MMU(了解)MMU是Memory Management Unit的缩写，中文名是内存管理单元，它是中央处理器（CPU）中用来管理虚拟存储器、物理存储器的控制线路，同时也负责虚拟地址映射为物理地址，以及提供硬件机制的内存访问授权，多用户多进程操作系统。 三. 进程控制块PCB(了解)进程运行时，内核为进程每个进程分配一个PCB（进程控...</div></div></div></a><a class="pagination-related" href="/2026/10/04/code-study/Linux/Linux%E7%BA%BF%E7%A8%8B/" title="Linux线程"><img class="cover" src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/cpp.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-10-04</div><div class="info-item-2">Linux线程</div></div><div class="info-2"><div class="info-item-1">Linux线程1 线程概念在许多经典的操作系统教科书中，总是把进程定义为程序的执行实例，它并不执行什么, 只是维护应用程序所需的各种资源，而线程则是真正的执行实体。 所以，线程是轻量级的进程（LWP：light weight process），在Linux环境下线程的本质仍是进程。 为了让进程完成一定的工作，进程必须至少包含一个线程。 进程，直观点说，保存在硬盘上的程序运行以后，会在内存空间里形成一个独立的内存体，这个内存体有自己的地址空间，有自己的堆，上级挂靠单位是操作系统。操作系统会以进程为单位，分配系统资源，所以我们也说，**进程是CPU分配资源的最小单位**。  线程存在与进程当中(进程可以认为是线程的容器)，是操作系统调度执行的最小单位。说通俗点，线程就是干活的。  进程是具有一定独立功能的程序关于某个数据集合上的一次运行活动，进程是系统进行资源分配和调度的一个独立单位。  线程是进程的一个实体，是 CPU 调度和分派的基本单位，它是比进程更小的能独立运行的基本单位。线程自己基本上不拥有系统资源，只拥有一点在运行中必不可少的资源（如程序计数器，一组寄存器和栈），但是它可...</div></div></div></a><a class="pagination-related" href="/2025/12/30/code-study/Linux/Linux%E4%BF%A1%E5%8F%B7/" title="Linux信号"><img class="cover" src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/ai.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-12-30</div><div class="info-item-2">Linux信号</div></div><div class="info-2"><div class="info-item-1">Linux信号1. 信号的概述信号的概念 信号是 Linux 进程间通信的最古老的方式。信号是软件中断，它是在软件层次上对中断机制的一种模拟，是一种异步通信的方式 。信号可以导致一个正在运行的进程被另一个正在运行的异步进程中断，转而处理某一个突发事件。 信号的特点  简单 不能携带大量信息 满足某个特设条件才发送  信号可以直接进行用户空间进程和内核空间进程的交互，内核进程可以利用它来通知用户空间进程发生了哪些系统事件。 一个完整的信号周期包括三个部分：信号的产生，信号在进程中的注册，信号在进程中的注销，执行信号处理函数。如下图所示：  Linux常规信号一览表 :    编号 信号 对应事件 默认动作    1 SIGHUP 用户退出shell时，由该shell启动的所有进程将收到这个信号 终止进程   2 SIGINT 当用户按下了**&lt;Ctrl+C&gt;**组合键时，用户终端向正在运行中的由该终端启动的程序发出此信号 终止进程   3 SIGQUIT 用户按下**&lt;ctrl+\&gt;**组合键时产生该信号，用户终端向正在运行中的由该终端启动的程序发出些信号 ...</div></div></div></a><a class="pagination-related" href="/2026/10/04/code-study/Linux/Linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" title="Linux网络编程"><img class="cover" src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/linux.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-10-04</div><div class="info-item-2">Linux网络编程</div></div><div class="info-2"><div class="info-item-1">1、基础概念1.1、底层协议传输层：   网络层：  数据链路层：  1.2、字节序（大端）网络字节序：  内存的低地址存放高位字节，高地址存放低位字节,    Socket套接字通信   （小端）主机字节序：  内存的低地址存放低位字节，高地址存放高位字节,  注：字符串无字节序的问题 字节序转换函数： 123456#include &lt;arpa/inet.h&gt;uint16_t htons(uint16_t hostshort);   //端口uint32_t htonl(uint32_t hostlong);   //ipv4uint16_t ntohs(uint16_t netshort);   //端口uint32_t ntohl(uint32_t netlong);   //ipv4     函数 作用 转换方向    htons() host to network short 主机序 → 网络序，16 位   htonl() host to network long 主机序 → 网络序，32 位   ntohs() network to host short...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/avatar/avatar.webp" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/site/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Langyuf</div><div class="author-info-description">Life is a long journey</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">24</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/langyuf"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B"><span class="toc-text">Linux系统编程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81gcc%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B"><span class="toc-text">一、gcc编译过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E9%9D%99%E6%80%81%E5%BA%93%E4%B8%8E%E5%8A%A8%E6%80%81%E5%BA%93"><span class="toc-text">二、静态库与动态库</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E4%B8%8E%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E6%AF%94%E8%BE%83"><span class="toc-text">2.1静态链接与动态链接比较</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2%E9%9D%99%E6%80%81%E5%BA%93%E5%88%B6%E4%BD%9C%E5%92%8C%E4%BD%BF%E7%94%A8"><span class="toc-text">2.2静态库制作和使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3%E5%8A%A8%E6%80%81%E5%BA%93%E5%88%B6%E4%BD%9C%E5%92%8C%E4%BD%BF%E7%94%A8"><span class="toc-text">2.3动态库制作和使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3ssh"><span class="toc-text">2.3ssh</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3g-%E8%B0%83%E8%AF%95"><span class="toc-text">2.3g++调试</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81GDB%E8%B0%83%E8%AF%95%E5%99%A8"><span class="toc-text">三、GDB调试器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1%E7%94%9F%E6%88%90%E8%B0%83%E8%AF%95%E4%BF%A1%E6%81%AF"><span class="toc-text">3.1生成调试信息</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2%E5%90%AF%E5%8A%A8GDB"><span class="toc-text">3.2启动GDB</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3%E6%98%BE%E7%A4%BA%E6%BA%90%E4%BB%A3%E7%A0%81"><span class="toc-text">3.3显示源代码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4%E6%96%AD%E7%82%B9%E6%93%8D%E4%BD%9C"><span class="toc-text">3.4断点操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5%E6%9D%A1%E4%BB%B6%E6%96%AD%E7%82%B9"><span class="toc-text">3.5条件断点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-6%E7%BB%B4%E6%8A%A4%E6%96%AD%E7%82%B9"><span class="toc-text">3.6维护断点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7%E8%B0%83%E8%AF%95%E4%BB%A3%E7%A0%81"><span class="toc-text">3.7调试代码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-8%E6%95%B0%E6%8D%AE%E6%9F%A5%E7%9C%8B"><span class="toc-text">3.8数据查看</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-9%E8%87%AA%E5%8A%A8%E6%98%BE%E7%A4%BA"><span class="toc-text">3.9自动显示</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-10-%E6%9F%A5%E7%9C%8B%E4%BF%AE%E6%94%B9%E5%8F%98%E9%87%8F%E7%9A%84%E5%80%BC"><span class="toc-text">3.10 查看修改变量的值</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3%E5%87%BD%E6%95%B0"><span class="toc-text">四、文件操作相关函数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-stat%E5%87%BD%E6%95%B0-%E9%87%8D%E7%82%B9"><span class="toc-text">4.1 stat函数(重点)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-access%E5%87%BD%E6%95%B0"><span class="toc-text">4.2 access函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3chmod%E5%87%BD%E6%95%B0"><span class="toc-text">4.3chmod函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-chown%E5%87%BD%E6%95%B0"><span class="toc-text">4.4 chown函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-5-truncate%E5%87%BD%E6%95%B0"><span class="toc-text">4.5 truncate函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-6-link%E5%87%BD%E6%95%B0"><span class="toc-text">4.6 link函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-7-symlink%E5%87%BD%E6%95%B0"><span class="toc-text">4.7 symlink函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-8-readlink%E5%87%BD%E6%95%B0"><span class="toc-text">4.8 readlink函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-9-unlink%E5%87%BD%E6%95%B0"><span class="toc-text">4.9 unlink函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-10-rename%E5%87%BD%E6%95%B0"><span class="toc-text">4.10 rename函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6%E6%93%8D%E4%BD%9C-%E9%87%8D%E7%82%B9"><span class="toc-text">五、文件描述符操作(重点)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-dup%E5%87%BD%E6%95%B0"><span class="toc-text">5.1 dup函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-dup2%E5%87%BD%E6%95%B0"><span class="toc-text">5.2 dup2函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-fcnlt%E5%87%BD%E6%95%B0"><span class="toc-text">5.3 fcnlt函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-%E7%9B%AE%E5%BD%95%E7%9B%B8%E5%85%B3%E6%93%8D%E4%BD%9C-%E6%8E%8C%E6%8F%A1"><span class="toc-text">六. 目录相关操作(掌握)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-getcwd%E5%87%BD%E6%95%B0"><span class="toc-text">6.1 getcwd函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-chdir%E5%87%BD%E6%95%B0"><span class="toc-text">6.2 chdir函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-3-opendir%E5%87%BD%E6%95%B0"><span class="toc-text">6.3 opendir函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-4-closedir%E5%87%BD%E6%95%B0"><span class="toc-text">6.4 closedir函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-5-readdir%E5%87%BD%E6%95%B0"><span class="toc-text">6.5 readdir函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83-%E6%97%B6%E9%97%B4%E7%9B%B8%E5%85%B3%E5%87%BD%E6%95%B0"><span class="toc-text">七. 时间相关函数</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/10/10/hello-world/" title="Hello World"><img src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/ai.webp" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/site/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/2026/10/10/hello-world/" title="Hello World">Hello World</a><time datetime="2026-10-10T09:36:19.254Z" title="发表于 2026-10-10 17:36:19">2026-10-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/10/10/%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA/" title="学习导航"><img src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/cpp.webp" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/site/404.jpg'" alt="学习导航"/></a><div class="content"><a class="title" href="/2026/10/10/%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA/" title="学习导航">学习导航</a><time datetime="2026-10-10T01:57:00.000Z" title="发表于 2026-10-10 09:57:00">2026-10-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/10/07/C%E7%9F%A5%E8%AF%86%E7%82%B9/" title="C++知识点"><img src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/pytorch.webp" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/site/404.jpg'" alt="C++知识点"/></a><div class="content"><a class="title" href="/2026/10/07/C%E7%9F%A5%E8%AF%86%E7%82%B9/" title="C++知识点">C++知识点</a><time datetime="2026-10-07T13:45:00.000Z" title="发表于 2026-10-07 21:45:00">2026-10-07</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/10/05/test.md/" title="test"><img src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/blog/test.png" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/site/404.jpg'" alt="test"/></a><div class="content"><a class="title" href="/2026/10/05/test.md/" title="test">test</a><time datetime="2026-10-05T13:21:00.000Z" title="发表于 2026-10-05 21:21:00">2026-10-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/10/04/code-study/AI/api_study/" title="Anthropic API 基础知识"><img src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/ai.webp" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/site/404.jpg'" alt="Anthropic API 基础知识"/></a><div class="content"><a class="title" href="/2026/10/04/code-study/AI/api_study/" title="Anthropic API 基础知识">Anthropic API 基础知识</a><time datetime="2026-10-04T07:02:17.000Z" title="发表于 2026-10-04 15:02:17">2026-10-04</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Langyuf</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.2</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.7.0</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.7.0"></script><script src="/js/main.js?v=5.7.0"></script><div class="js-pjax"></div><script src="/js/custom.js"></script><script defer src="/js/wallpaper.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js" defer="defer"></script><script>document.addEventListener('DOMContentLoaded', () => {
+  const pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+  window.pjax = new Pjax({
+    elements: 'a:not([target="_blank"]):not([data-fancybox]):not([href="/en/"])',
+    selectors: pjaxSelectors,
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+  })
+
+  const triggerPjaxFn = (val) => {
+    if (!val) return
+    Object.values(val).forEach(fn => {
+      try {
+        fn()
+      } catch (err) {
+        console.debug('Pjax callback failed:', err)
+      }
+    })
+  }
+
+  document.addEventListener('pjax:send', () => {
+    // removeEventListener
+    btf.removeGlobalFnEvent('pjaxSendOnce')
+    btf.removeGlobalFnEvent('themeChange')
+
+    // reset readmode
+    const $bodyClassList = document.body.classList
+    if ($bodyClassList.contains('read-mode')) $bodyClassList.remove('read-mode')
+
+    triggerPjaxFn(window.globalFn.pjaxSend)
+  })
+
+  document.addEventListener('pjax:complete', () => {
+    btf.removeGlobalFnEvent('pjaxCompleteOnce')
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+      if (!item.parentNode) return
+      const newScript = document.createElement('script')
+      const content = item.text || item.textContent || ''
+      Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+      newScript.appendChild(document.createTextNode(content))
+      item.parentNode.replaceChild(newScript, item)
+    })
+
+    triggerPjaxFn(window.globalFn.pjaxComplete)
+  })
+
+  document.addEventListener('pjax:error', e => {
+    const responseURL = e.request && e.request.responseURL
+    if (e.request && e.request.status === 404) {
+      true
+        ? pjax.loadUrl('/404.html')
+        : responseURL && (window.location.href = responseURL)
+    } else if (responseURL) {
+      window.location.href = responseURL
+    }
+  })
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.7.0"></script></div></div><!-- hexo injector body_end start --> <script data-pjax>if(document.getElementById('recent-posts') && (location.pathname ==='/'|| '/' ==='all')){
+    var parent = document.getElementById('recent-posts');
+    var child = '<div class="recent-post-item" style="width:100%;height: auto"><div id="catalog_magnet"><div class="magnet_item"><a class="magnet_link" href="https://langyuf.github.io/categories/AI/"><div class="magnet_link_context" style=""><span style="font-weight:500;flex:1">🤖 AI (2)</span><span style="padding:0px 4px;border-radius: 8px;"><i class="fas fa-arrow-circle-right"></i></span></div></a></div><div class="magnet_item"><a class="magnet_link" href="https://langyuf.github.io/categories/CPP/"><div class="magnet_link_context" style=""><span style="font-weight:500;flex:1">🧩 CPP (5)</span><span style="padding:0px 4px;border-radius: 8px;"><i class="fas fa-arrow-circle-right"></i></span></div></a></div><div class="magnet_item"><a class="magnet_link" href="https://langyuf.github.io/categories/Linux/"><div class="magnet_link_context" style=""><span style="font-weight:500;flex:1">🐧 Linux (6)</span><span style="padding:0px 4px;border-radius: 8px;"><i class="fas fa-arrow-circle-right"></i></span></div></a></div><div class="magnet_item"><a class="magnet_link" href="https://langyuf.github.io/categories/机器学习/"><div class="magnet_link_context" style=""><span style="font-weight:500;flex:1">🧠 机器学习 (2)</span><span style="padding:0px 4px;border-radius: 8px;"><i class="fas fa-arrow-circle-right"></i></span></div></a></div><div class="magnet_item" style="visibility: hidden"></div><div class="magnet_item" style="visibility: hidden"></div><a class="magnet_link_more"  href="https://langyuf.github.io/categories" style="flex:1;text-align: center;margin-bottom: 10px;">查看更多...</a></div></div>';
+    console.log('已挂载magnet')
+    parent.insertAdjacentHTML("afterbegin",child)}
+     </script><style>#catalog_magnet{flex-wrap: wrap;display: flex;width:100%;justify-content:space-between;padding: 10px 10px 0 10px;align-content: flex-start;}.magnet_item{flex-basis: calc(33.333333333333336% - 5px);background: #f2f2f2;margin-bottom: 10px;border-radius: 8px;transition: all 0.2s ease-in-out;}.magnet_item:hover{background: #49b1f5}.magnet_link_more{color:#555}.magnet_link{color:black}.magnet_link:hover{color:white}@media screen and (max-width: 600px) {.magnet_item {flex-basis: 100%;}}.magnet_link_context{display:flex;padding: 10px;font-size:16px;transition: all 0.2s ease-in-out;}.magnet_link_context:hover{padding: 10px 20px;}</style>
+    <style></style><script data-pjax>
+  function butterfly_footer_beautify_injector_config(){
+    var parent_div_git = document.getElementById('footer');
+    var item_html = '<div id="workboard"></div><p id="ghbdages"><a class="github-badge" target="_blank" href="https://hexo.io/" style="margin-inline:5px" data-title="博客框架为 Hexo_v8.1.2" title=""><img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&amp;logo=hexo" alt=""/></a><a class="github-badge" target="_blank" href="https://butterfly.js.org/" style="margin-inline:5px" data-title="主题版本 Butterfly_v5.7.0" title=""><img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&amp;logo=bitdefender" alt=""/></a><a class="github-badge" target="_blank" href="https://pages.github.com/" style="margin-inline:5px" data-title="本站托管于 GitHub Pages" title=""><img src="https://img.shields.io/badge/Hosted-GitHub%20Pages-blue?style=flat&amp;logo=github" alt=""/></a><a class="github-badge" target="_blank" href="https://github.com/langyuf/langyuf.github.io" style="margin-inline:5px" data-title="本站项目由 GitHub 托管" title=""><img src="https://img.shields.io/badge/Source-GitHub-d021d6?style=flat&amp;logo=GitHub" alt=""/></a></p>';
+    console.log('已挂载butterfly_footer_beautify')
+    parent_div_git.insertAdjacentHTML("beforeend",item_html)
+    }
+  var elist = 'undefined'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var flag = 0;
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_footer_beautify_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_footer_beautify_injector_config();
+  }
+  </script><script async src="/js/runtime.js"></script><div class="js-pjax"><script async="async">var arr = document.getElementsByClassName('recent-post-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '1s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '100');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('card-widget');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '1s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '100');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script></div><script defer src="/js/wow.min.js"></script><script defer src="/js/wow_init.js"></script><script data-pjax>
+  function butterfly_swiper_injector_config(){
+    var parent_div_git = document.getElementById('recent-posts');
+    var item_html = '<div class="recent-post-item" style="height: auto;width: 100%"><div class="blog-slider swiper-container-fade swiper-container-horizontal" id="swiper_container"><div class="blog-slider__wrp swiper-wrapper" style="transition-duration: 0ms;"><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2026/08/04/code-study/AI/AI相关概念/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/ai.webp" alt="" onerror="this.src=https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/site/error-page.png; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2026-08-04</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2026/08/04/code-study/AI/AI相关概念/&quot;);" href="javascript:void(0);" alt="">AI相关概念</a><div class="blog-slider__text">点击「详情」查看笔记全文</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2026/08/04/code-study/AI/AI相关概念/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2026/10/04/code-study/机器学习/PyTorch/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/pytorch.webp" alt="" onerror="this.src=https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/site/error-page.png; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2026-10-04</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2026/10/04/code-study/机器学习/PyTorch/&quot;);" href="javascript:void(0);" alt="">PyTorch</a><div class="blog-slider__text">点击「详情」查看笔记全文</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2026/10/04/code-study/机器学习/PyTorch/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2026/10/04/code-study/Linux/Linux网络编程/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/linux.webp" alt="" onerror="this.src=https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/site/error-page.png; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2026-10-04</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2026/10/04/code-study/Linux/Linux网络编程/&quot;);" href="javascript:void(0);" alt="">Linux网络编程</a><div class="blog-slider__text">点击「详情」查看笔记全文</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2026/10/04/code-study/Linux/Linux网络编程/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2026/10/04/code-study/CPP/C++语法/C++基础/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/covers/cpp.webp" alt="" onerror="this.src=https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/site/error-page.png; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2026-10-04</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2026/10/04/code-study/CPP/C++语法/C++基础/&quot;);" href="javascript:void(0);" alt="">C++基础</a><div class="blog-slider__text">点击「详情」查看笔记全文</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2026/10/04/code-study/CPP/C++语法/C++基础/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;2026/10/05/test.md/&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/blog/test.png" alt="" onerror="this.src=https://cdn.jsdelivr.net/gh/langyuf/Image-hosting@main/hexo_blog/site/error-page.png; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2026-10-05</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;2026/10/05/test.md/&quot;);" href="javascript:void(0);" alt="">test</a><div class="blog-slider__text">点击「详情」查看笔记全文</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;2026/10/05/test.md/&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div></div><div class="blog-slider__pagination swiper-pagination-clickable swiper-pagination-bullets"></div></div></div>';
+    console.log('已挂载butterfly_swiper')
+    parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+    }
+  var elist = 'undefined'.split(',');
+  var cpage = location.pathname;
+  var epage = '/';
+  var flag = 0;
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_swiper_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_swiper_injector_config();
+  }
+  </script><script defer src="/js/swiper.min.js"></script><script defer data-pjax src="/js/swiper_init.js"></script><!-- hexo injector body_end end --></body></html>
